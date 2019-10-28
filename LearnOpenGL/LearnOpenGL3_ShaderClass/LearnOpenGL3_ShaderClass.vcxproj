@@ -116,9 +116,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\packages\src\shader.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\packages\src\glad.c" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
