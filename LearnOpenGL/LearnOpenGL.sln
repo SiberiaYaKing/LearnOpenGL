@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL1", "LearnOpenGL1\LearnOpenGL1.vcxproj", "{ACD81727-78FD-4BEC-89EB-FDF1E5F5006E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL1_HelloWindow", "LearnOpenGL1\LearnOpenGL1.vcxproj", "{ACD81727-78FD-4BEC-89EB-FDF1E5F5006E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL2_Draw2Triangle", "LearnOpenGL2_Draw2Triangle\LearnOpenGL2_Draw2Triangle.vcxproj", "{78C2415D-B882-4CEC-96B7-A488491531FD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL2_DrawTriangle", "LearnOpenGL2_Draw2Triangle\LearnOpenGL2_Draw2Triangle.vcxproj", "{78C2415D-B882-4CEC-96B7-A488491531FD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL3_ShaderClass", "LearnOpenGL3_ShaderClass\LearnOpenGL3_ShaderClass.vcxproj", "{306917E8-02D7-4F72-A31E-68959BF9D7F9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL4_Texture", "LearnOpenGL4_Texture\LearnOpenGL4_Texture.vcxproj", "{71E3C827-A087-411F-B450-47E81396AA32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{306917E8-02D7-4F72-A31E-68959BF9D7F9}.Release|x64.Build.0 = Release|x64
 		{306917E8-02D7-4F72-A31E-68959BF9D7F9}.Release|x86.ActiveCfg = Release|Win32
 		{306917E8-02D7-4F72-A31E-68959BF9D7F9}.Release|x86.Build.0 = Release|Win32
+		{71E3C827-A087-411F-B450-47E81396AA32}.Debug|x64.ActiveCfg = Debug|x64
+		{71E3C827-A087-411F-B450-47E81396AA32}.Debug|x64.Build.0 = Debug|x64
+		{71E3C827-A087-411F-B450-47E81396AA32}.Debug|x86.ActiveCfg = Debug|Win32
+		{71E3C827-A087-411F-B450-47E81396AA32}.Debug|x86.Build.0 = Debug|Win32
+		{71E3C827-A087-411F-B450-47E81396AA32}.Release|x64.ActiveCfg = Release|x64
+		{71E3C827-A087-411F-B450-47E81396AA32}.Release|x64.Build.0 = Release|x64
+		{71E3C827-A087-411F-B450-47E81396AA32}.Release|x86.ActiveCfg = Release|Win32
+		{71E3C827-A087-411F-B450-47E81396AA32}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
