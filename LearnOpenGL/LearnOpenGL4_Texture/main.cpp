@@ -141,7 +141,7 @@ int main() {
 
 		ourShader.use();
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);   //画三角形
+		glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);   ////画矩形
 
 		//检查并调用事件，交换缓冲
 		glfwSwapBuffers(window);
