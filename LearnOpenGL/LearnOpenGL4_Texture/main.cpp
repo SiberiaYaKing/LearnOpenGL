@@ -243,10 +243,10 @@ void loadTexture(unsigned int &texture,const char* texPath,const char* texType) 
 	//绑定纹理，设置纹理类型
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//为当前绑定的纹理对象设置wrap,filter模式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);      //纹理在S轴上的环绕方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);      //纹理在T轴上的环绕方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  //纹理缩小的过滤方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  //纹理放大的过滤方式
 	//加载并生成纹理
 	int width, height, nrChannels;  //宽度，高度，颜色通道数
 	stbi_set_flip_vertically_on_load(true);  //反转纹理
