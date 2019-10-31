@@ -1,6 +1,6 @@
 
 
-
+#include <camera.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <shader.h>
@@ -83,11 +83,16 @@ glm::vec3 cubePositions[] = {
 //glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection)); //相机X轴方向
 //glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);   //相机Y轴方向
 
-//相机参数
-glm::vec3 cameraPos = glm::vec3(0, 0, 3);  
-glm::vec3 cameraFront = glm::vec3(0, 0, -1);  
-glm::vec3 cameraUp = glm::vec3(0, 1, 0);  
-float fov = 45;
+////相机参数
+//glm::vec3 cameraPos = glm::vec3(0, 0, 3);  
+//glm::vec3 cameraFront = glm::vec3(0, 0, -1);  
+//glm::vec3 cameraUp = glm::vec3(0, 1, 0);  
+//float fov = 45;
+////俯仰角(pitch)和偏航角(yaw)
+//float pitch = 0, yaw = -90; //设成-90是为了与相机初始化朝向一致
+
+//使用自定义的相机类
+Camera myCam(glm::vec3(0, 0, 3));
 
 //固定时间差
 float deltaTime = 0.0f;
@@ -102,16 +107,13 @@ float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 float sensitivity = 0.05f;  //鼠标灵敏度值
 bool firstMouse = true; //解决相机跳跃问题
 
-//俯仰角(pitch)和偏航角(yaw)
-float pitch = 0, yaw = -90; //设成-90是为了与相机初始化朝向一致
+
 
 inline int initWindow(GLFWwindow*&);
 void processInput(GLFWwindow*);
 inline unsigned int* loadVertex();
 inline unsigned int & loadTexture(const char*, const char*);
-
-
-
+//glm::mat4 my_loockAt_matrix(glm::vec3 position, glm::vec3 target, glm::vec3 worldUp);
 
 int main() {
 	GLFWwindow* window = NULL;
@@ -161,10 +163,12 @@ int main() {
 		//float camX = sin(glfwGetTime())*radius;
 		//float camZ = cos(glfwGetTime())*radius; //计算相机在圆上的位置	
 		//view = glm::lookAt(glm::vec3(camX, 0, camZ), cameraTarget, up);  //构建lookat矩阵
-		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		//glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		//glm::mat4 view = my_loockAt_matrix(myCam.Position, myCam.Position+myCam.Front, myCam.Up);
+		glm::mat4 view = myCam.GetViewMatrix();
 		ourShader.setMat4("view", view);
 
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		ourShader.setMat4("projection", projection);
 
 
@@ -214,6 +218,7 @@ int initWindow(GLFWwindow*& window) {
 	});
 	//隐藏光标并让光标留在当前窗口
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	//监听鼠标移动事件
 	glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xpos, double ypos) {
 		//解决镜头一开始跳很远
@@ -228,29 +233,31 @@ int initWindow(GLFWwindow*& window) {
 		lastX = xpos;
 		lastY = ypos;
 
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
+		myCam.ProcessMouseMovement(xoffset, yoffset);
+		//xoffset *= sensitivity;
+		//yoffset *= sensitivity;
 
-		yaw += xoffset;
-		pitch += yoffset;
+		//yaw += xoffset;
+		//pitch += yoffset;
 
-		if (pitch > 89)pitch = 89;
-		if (pitch < -89)pitch = -89;
+		//if (pitch > 89)pitch = 89;
+		//if (pitch < -89)pitch = -89;
 
-		glm::vec3 front;  //相机旋转会不断改变前方向，需要每帧计算
-		front.x = cos(glm::radians(pitch))*cos(glm::radians(yaw));// pitch与yaw是角度制，三角函数需要弧度制为参数
-		front.y = sin(glm::radians(pitch));
-		front.z = cos(glm::radians(pitch))*sin(glm::radians(yaw));
-		cameraFront = glm::normalize(front);
+		//glm::vec3 front;  //相机旋转会不断改变前方向，需要每帧计算
+		//front.x = cos(glm::radians(pitch))*cos(glm::radians(yaw));// pitch与yaw是角度制，三角函数需要弧度制为参数
+		//front.y = sin(glm::radians(pitch));
+		//front.z = cos(glm::radians(pitch))*sin(glm::radians(yaw));
+		//cameraFront = glm::normalize(front);
 	});
+
 	//当前上下文
 	glfwMakeContextCurrent(window);
+
 	//监听鼠标滚轮事件
 	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
-		if (fov >= 1.0f&&fov <= 45) fov -= yoffset;
-		if (fov <= 1) fov = 1;
-		if (fov >= 45) fov = 45;
+		myCam.ProcessMouseScroll(yoffset);
 	});
+
 	//初始化GLAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		cout << "Failed to initialize GLAD" << endl;
@@ -261,17 +268,22 @@ int initWindow(GLFWwindow*& window) {
 
 //处理键鼠输入
 void processInput(GLFWwindow* window) {
-	float cameraSpeed = 5*deltaTime;
+	//float cameraSpeed = 5*deltaTime;
+	myCam.MovementSpeed = 5;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
+		//cameraPos += cameraSpeed * cameraFront;
+		myCam.ProcessKeyboard(FORWARD, deltaTime);
 	if(glfwGetKey(window,GLFW_KEY_S)==GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
+		//cameraPos -= cameraSpeed * cameraFront;
+		myCam.ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp))*cameraSpeed;
+		//cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp))*cameraSpeed;
+		myCam.ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp))*cameraSpeed;
+		//cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp))*cameraSpeed;
+		myCam.ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
 }
 
 //载入顶点数据
@@ -330,4 +342,32 @@ unsigned int & loadTexture(const char* texPath, const char* texType) {
 	stbi_image_free(data);
 	return texture;
 }
+
+//自己计算lookAt矩阵
+//glm::mat4 my_loockAt_matrix(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
+//	//格拉姆--施密特正交化 求摄像机三轴
+//	glm::vec3 zaxis = glm::normalize(position - target);
+//	glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(up),zaxis));
+//	glm::vec3 yaxis = glm::normalize(glm::cross(zaxis, xaxis));
+//
+//	//构建矩阵, 注意glm的矩阵是列优先矩阵！！
+//	glm::mat4 translation = glm::mat4(1.0f);
+//	translation[3][0] = -position.x;
+//	translation[3][1] = -position.y;
+//	translation[3][2] = -position.z;
+//	glm::mat4 rotation = glm::mat4(1.0f);
+//	rotation[0][0] = xaxis.x;
+//	rotation[1][0] = xaxis.y;
+//	rotation[2][0] = xaxis.z;
+//	rotation[0][1] = yaxis.x;
+//	rotation[1][1] = yaxis.y;
+//	rotation[2][1] = yaxis.z;
+//	rotation[0][2] = zaxis.x;
+//	rotation[1][2] = zaxis.y;
+//	rotation[2][2] = zaxis.z;
+//
+//	return rotation * translation;
+//}
+
+
 
