@@ -246,7 +246,7 @@ void loadTexture(unsigned int &texture,const char* texPath,const char* texType) 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);      //纹理在S轴上的环绕方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);      //纹理在T轴上的环绕方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  //纹理缩小的过滤方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  //纹理放大的过滤方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  //纹理放大的过滤方式
 	//加载并生成纹理
 	int width, height, nrChannels;  //宽度，高度，颜色通道数
 	stbi_set_flip_vertically_on_load(true);  //反转纹理
