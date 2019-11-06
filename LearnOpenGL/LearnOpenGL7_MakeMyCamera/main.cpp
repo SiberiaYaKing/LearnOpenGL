@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 using namespace std;
 
@@ -133,6 +134,7 @@ int main() {
 	ourShader.setInt("texture2", 1);  
 
 	glEnable(GL_DEPTH_TEST); //开启深度测试
+	//glEnable(GL_CULL_FACE);
 
 	//渲染循环
 	while (!glfwWindowShouldClose(window)) {
@@ -176,7 +178,10 @@ int main() {
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f*(i + 1)*glfwGetTime();
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			glm::quat q;
+			q=glm::rotate(q,glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			model = model * glm::mat4_cast(q);
+			//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			ourShader.setMat4("model", model);
 			
 			glDrawArrays(GL_TRIANGLES, 0, 36);  //画立方体
