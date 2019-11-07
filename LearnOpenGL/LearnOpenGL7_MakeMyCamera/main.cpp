@@ -12,7 +12,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 using namespace std;
@@ -221,6 +220,10 @@ int initWindow(GLFWwindow*& window) {
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		glViewport(0, 0, width, height);
 	});
+
+	//当前上下文
+	glfwMakeContextCurrent(window);
+
 	//隐藏光标并让光标留在当前窗口
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -255,8 +258,7 @@ int initWindow(GLFWwindow*& window) {
 		//cameraFront = glm::normalize(front);
 	});
 
-	//当前上下文
-	glfwMakeContextCurrent(window);
+
 
 	//监听鼠标滚轮事件
 	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
@@ -307,8 +309,8 @@ unsigned int* loadVertex() {
 	//告诉显卡顶点属性的结构，让显卡解析
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	return vids;
 
