@@ -72,9 +72,9 @@ float lastFrame = 0.0f;
 
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
-Camera myCam(glm::vec3(0, 0, 3));
+Camera myCam(vec3(0, 0, 3));
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 inline void processInput(GLWindow &);
 
@@ -137,9 +137,9 @@ int main() {
 
 		processInput(window);
 
-		glm::mat4 projection = glm::perspective(glm::radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = myCam.GetViewMatrix();
-		glm::mat4 model = glm::mat4(1.0f);
+		mat4 projection = perspective(radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		mat4 view = myCam.GetViewMatrix();
+		mat4 model = mat4(1.0f);
 
 		lightingShader.use();
 		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
@@ -150,9 +150,9 @@ int main() {
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		model = glm::mat4(1.0f);  //清空model为单位阵
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		model = mat4(1.0f);  //清空model为单位阵
+		model = translate(model, lightPos);
+		model = scale(model, vec3(0.2f)); // a smaller cube
 
 		lampShader.use();
 		lampShader.setMat4("projection", projection);

@@ -16,16 +16,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+//#include "imgui/imgui.h"
+//#include "imgui/imgui_impl_glfw_gl3.h"
 
 
 using namespace std;
 using namespace glm;
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
-#pragma comment(lib, "legacy_stdio_definitions")
-#endif
 
 //cube with normal
 float vertices[] = {
@@ -80,11 +76,13 @@ float lastFrame = 0.0f;
 
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
-Camera myCam(glm::vec3(0, 0, 3));
-
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+Camera myCam(vec3(1.7f, -1.6f, 3));
 
 inline void processInput(GLWindow &);
+
+vec3 lightColor(1.0f, 1, 1);
+float lightIntencity = 1.0f;
+//bool isCursor = false;
 
 int main() {
 	
@@ -137,16 +135,15 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
+	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//ImGui::CreateContext();
+	//ImGui_ImplGlfwGL3_Init(window.getWindowPtr(), true);
+	//ImGui::StyleColorsDark();
 
-	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ImGui::CreateContext();
-	ImGui_ImplGlfwGL3_Init(window.getWindowPtr(), true);
-	ImGui::StyleColorsDark();
-
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//bool show_demo_window = true;
+	//bool show_another_window = false;
+	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	while (!window.isWindowClosed()) {
 
@@ -159,25 +156,28 @@ int main() {
 
 		processInput(window);
 
-		glm::mat4 projection = glm::perspective(glm::radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = myCam.GetViewMatrix();
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat3 normalMat = glm::mat3(glm::transpose(glm::inverse(model)));  //法线矩阵
+		mat4 projection = perspective(radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		mat4 view = myCam.GetViewMatrix();
+		mat4 model = mat4(1.0f);
+		mat3 normalMat = mat3(transpose(inverse(model)));  //法线矩阵
+		vec3 lightPos = vec3(sin(glfwGetTime()), 1.6f, 2.6f);
 
 		lightingShader.use();
 		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("lightColor", lightColor*lightIntencity);
 		lightingShader.setVec3("lightPos", lightPos);
 		lightingShader.setMat4("projection", projection);
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("model", model);
 		lightingShader.setMat3("normalMat", normalMat);
+		lightingShader.setVec3("viewPos", myCam.Position);
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		model = glm::mat4(1.0f);  //清空model为单位阵
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		model = mat4(1.0f);  //清空model为单位阵
+		model = translate(model, lightPos);
+		model = scale(model, vec3(0.2f)); // a smaller cube
+
 
 		lampShader.use();
 		lampShader.setMat4("projection", projection);
@@ -186,36 +186,36 @@ int main() {
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		ImGui_ImplGlfwGL3_NewFrame();
-		{
-			static float f = 0.0f;
-			static int counter = 0;
-			ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+		////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		//ImGui_ImplGlfwGL3_NewFrame();
+		//{
+		//	static float f = 0.0f;
+		//	static int counter = 0;
+		//	ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
+		//	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+		//	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
+		//	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
+		//	ImGui::Checkbox("Another Window", &show_another_window);
 
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
+		//	if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+		//		counter++;
+		//	ImGui::SameLine();
+		//	ImGui::Text("counter = %d", counter);
 
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		}
-		ImGui::Render();
-		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
-		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//}
+		//ImGui::Render();
+		//ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+		////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 		window.swapBuffersAndPollEvents();
 	}
 
-	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ImGui_ImplGlfwGL3_Shutdown();
-	ImGui::DestroyContext();
-	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//ImGui_ImplGlfwGL3_Shutdown();
+	//ImGui::DestroyContext();
+	////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteVertexArrays(1, &lightVAO);
@@ -237,5 +237,11 @@ void processInput(GLWindow & w)
 		myCam.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(pw, GLFW_KEY_D) == GLFW_PRESS)
 		myCam.ProcessKeyboard(RIGHT, deltaTime);
+	//if (glfwGetKey(pw, GLFW_KEY_SPACE) == GLFW_PRESS) {
+	//	if(!isCursor) w.setCursorEnable();
+	//	else w.setCursorDisable();
+	//	isCursor = !isCursor;
+	//}
+		
 }
 
