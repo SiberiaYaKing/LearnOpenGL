@@ -1,6 +1,8 @@
+//gl相关的头文件有顺序要求
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-//gl相关的头文件有顺序要求
+
 #include <shader.h>
 #include <camera.h>
 
@@ -69,13 +71,12 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
-float sensitivity = 0.05f;
 bool firstMouse = true;
 Camera myCam(glm::vec3(0, 0, 3));
 
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-void processInput(GLFWwindow *);
+inline void processInput(GLWindow &);
 
 int main() {
 	
@@ -105,13 +106,12 @@ int main() {
 	});
 
 	unsigned cubeVAO, VBO,lightVAO;
+	glGenBuffers(1, &VBO);
 	//box vertices process
 	glGenVertexArrays(1, &cubeVAO);
-	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glBindVertexArray(cubeVAO);
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	//light-obj vertices process
@@ -135,27 +135,28 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		processInput(window.getWindowPtr());
+		processInput(window);
+
+		glm::mat4 projection = glm::perspective(glm::radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = myCam.GetViewMatrix();
+		glm::mat4 model = glm::mat4(1.0f);
 
 		lightingShader.use();
 		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		
-		glm::mat4 projection = glm::perspective(glm::radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = myCam.GetViewMatrix();
 		lightingShader.setMat4("projection", projection);
 		lightingShader.setMat4("view", view);
-		glm::mat4 model = glm::mat4(1.0f);
 		lightingShader.setMat4("model", model);
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		model = glm::mat4(1.0f);  //清空model为单位阵
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+
 		lampShader.use();
 		lampShader.setMat4("projection", projection);
 		lampShader.setMat4("view", view);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 		lampShader.setMat4("model", model);
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -169,18 +170,18 @@ int main() {
 	return 0;
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLWindow & w)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	GLFWwindow *pw = w.getWindowPtr();
+	if (glfwGetKey(pw, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(pw, true);
+	if (glfwGetKey(pw, GLFW_KEY_W) == GLFW_PRESS)
 		myCam.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(pw, GLFW_KEY_S) == GLFW_PRESS)
 		myCam.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(pw, GLFW_KEY_A) == GLFW_PRESS)
 		myCam.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(pw, GLFW_KEY_D) == GLFW_PRESS)
 		myCam.ProcessKeyboard(RIGHT, deltaTime);
 }
 
