@@ -124,8 +124,8 @@
     <None Include="lightingShader.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\packages\src\glad.c" />
-    <ClCompile Include="..\..\..\packages\src\stb_image.cpp" />
+    <ClCompile Include="..\..\OpenGLPackages\src\glad.c" />
+    <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />

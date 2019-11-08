@@ -201,10 +201,10 @@ int main() {
 			ImGui::SliderFloat("Yaw", &yaw, -180, 180);
 			ImGui::SliderFloat("Pitch", &pitch, -89.0f, 89.0f);
 			myCam.SetRotation(yaw, pitch);
-			ImGui::DragFloat3("Position", value_ptr(position),0.4f);
+			ImGui::DragFloat3("Position", value_ptr(position),0.05f);
 			myCam.SetPosition(position);
 			ImGui::Text("Light Color");
-			ImGui::DragFloat("intencity", &intencity,0.1f,0,5);
+			ImGui::DragFloat("intencity", &intencity,0.05f,0,5);
 			ImGui::ColorEdit3("lightColor", (float*)&lightColor);
 			//ImGui::ColorEdit3("light ambient", (float*)&la);
 			//ImGui::ColorEdit3("light diffuse", (float*)&ld); 
