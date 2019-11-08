@@ -237,11 +237,5 @@ void processInput(GLWindow & w)
 		myCam.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(pw, GLFW_KEY_D) == GLFW_PRESS)
 		myCam.ProcessKeyboard(RIGHT, deltaTime);
-	//if (glfwGetKey(pw, GLFW_KEY_SPACE) == GLFW_PRESS) {
-	//	if(!isCursor) w.setCursorEnable();
-	//	else w.setCursorDisable();
-	//	isCursor = !isCursor;
-	//}
-		
 }
 
