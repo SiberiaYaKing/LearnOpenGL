@@ -117,7 +117,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="imgui.ini" />
     <None Include="lampShader.fs" />
     <None Include="lampShader.vs" />
     <None Include="lightingShader.fs" />
@@ -125,21 +124,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\OpenGLPackages\src\glad.c" />
+    <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp" />
-    <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
-    <ClCompile Include="imgui\imgui_draw.cpp" />
-    <ClCompile Include="imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="imgui\imconfig.h" />
-    <ClInclude Include="imgui\imgui.h" />
-    <ClInclude Include="imgui\imgui_impl_glfw_gl3.h" />
-    <ClInclude Include="imgui\imgui_internal.h" />
-    <ClInclude Include="imgui\stb_rect_pack.h" />
-    <ClInclude Include="imgui\stb_textedit.h" />
-    <ClInclude Include="imgui\stb_truetype.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

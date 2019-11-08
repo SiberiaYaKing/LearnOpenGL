@@ -127,9 +127,6 @@
     <None Include="lightingShader.fs" />
     <None Include="lightingShader.vs" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="opengl_window.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

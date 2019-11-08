@@ -15,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "opengl_window.h"
+#include <opengl_window.h>
 
 using namespace std;
 using namespace glm;
