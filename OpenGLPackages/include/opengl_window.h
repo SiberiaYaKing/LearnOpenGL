@@ -25,17 +25,17 @@ private:
 	GLFWwindow *window;
 public:
 	void initWindow(unsigned int width,unsigned int height,const std::string &name);
-	void setCursorDisable() const;
-	void setCursorEnable()const;
-	void setCursorPosCallback(GLFWcursorposfun cbfun) const;
-	void setScrollCallback(GLFWscrollfun cbfun) const;
-	void swapBuffersAndPollEvents() const;
+	void setCursorDisable();
+	void setCursorEnable();
+	void setCursorPosCallback(GLFWcursorposfun cbfun);
+	void setScrollCallback(GLFWscrollfun cbfun);
+	void swapBuffersAndPollEvents();
 	GLFWwindow* getWindowPtr()const;
 	bool isWindowClosed() const;
 	~GLWindow();
 };
 
-void GLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name){
+void GLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -64,19 +64,19 @@ GLWindow::~GLWindow() {
 	glfwTerminate();
 }
 
-void GLWindow::setCursorDisable() const {
+void GLWindow::setCursorDisable() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void GLWindow::setCursorEnable()const {
+void GLWindow::setCursorEnable() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-void GLWindow::setCursorPosCallback(GLFWcursorposfun cbfun) const {
+void GLWindow::setCursorPosCallback(GLFWcursorposfun cbfun)  {
 	glfwSetCursorPosCallback(window, cbfun);
 }
 
-void GLWindow::setScrollCallback(GLFWscrollfun cbfun) const {
+void GLWindow::setScrollCallback(GLFWscrollfun cbfun)  {
 	glfwSetScrollCallback(window, cbfun);
 }
 
@@ -84,7 +84,7 @@ bool GLWindow::isWindowClosed() const {
 	return glfwWindowShouldClose(window);
 }
 
-void GLWindow::swapBuffersAndPollEvents() const {
+void GLWindow::swapBuffersAndPollEvents()  {
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }

@@ -196,6 +196,7 @@ int main() {
 		{
 			static float yaw = -55;
 			static float pitch = 28;
+			static float zoom = 45.0f;
 			static vec3 position{ -2.8f,-2.0f,5.6f };
 			ImGui::Text("Camera Parama");                        
 			ImGui::SliderFloat("Yaw", &yaw, -180, 180);
@@ -203,6 +204,8 @@ int main() {
 			myCam.SetRotation(yaw, pitch);
 			ImGui::DragFloat3("Position", value_ptr(position),0.05f);
 			myCam.SetPosition(position);
+			ImGui::SliderFloat("Zoom", &zoom, 0.0f, 60.0f);
+			myCam.SetZoom(zoom);
 			ImGui::Text("Light Color");
 			ImGui::DragFloat("intencity", &intencity,0.05f,0,5);
 			ImGui::ColorEdit3("lightColor", (float*)&lightColor);

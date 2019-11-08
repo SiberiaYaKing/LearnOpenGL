@@ -80,6 +80,10 @@ public:
 		Position =  posOffset; // Front * posOffset.z + Right * posOffset.x + Up * posOffset.y;
 	}
 
+	void SetZoom(float zoom) {
+		Zoom = zoom;
+	}
+
 	// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime)
 	{
@@ -117,12 +121,12 @@ public:
 	// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
 	void ProcessMouseScroll(float yoffset)
 	{
-		if (Zoom >= 1.0f && Zoom <= 45.0f)
+		if (Zoom >= 1.0f && Zoom <= 60.0f)
 			Zoom -= yoffset;
 		if (Zoom <= 1.0f)
 			Zoom = 1.0f;
-		if (Zoom >= 45.0f)
-			Zoom = 45.0f;
+		if (Zoom >= 60.0f)
+			Zoom = 60.0f;
 	}
 
 private:
