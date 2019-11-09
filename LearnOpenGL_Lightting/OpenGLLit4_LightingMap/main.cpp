@@ -16,8 +16,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
+
+#include <texture.h>
 
 using namespace std;
 using namespace glm;
@@ -78,8 +80,8 @@ float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
 Camera myCam(vec3(0, 0, 3));
 
-inline void processInput(GLWindow &);
-inline int LoadTexture(const char* img_path);
+inline void processInput(OpenGLWindow &);
+//inline int LoadTexture(const char* img_path);
 
 static float shininess = 0.25f;
 ImVec4 la(0.2f, 0.2f, 0.2f,1);
@@ -88,7 +90,7 @@ ImVec4 ls(1.0f, 1.0f, 1.0f,1);
 
 int main() {
 	
-	GLWindow window;
+	OpenGLWindow window;
 	try {
 		window.initWindow(SCR_WIDTH,SCR_HEIGHT,"OpenGL_Lighting");
 	}
@@ -120,13 +122,21 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//=======================================
-	unsigned emissionMap = LoadTexture("matrix.jpg");
-	unsigned diffuseMap = LoadTexture("container2.png");
+	////=======================================
+	//unsigned emissionMap = LoadTexture("matrix.jpg");
+	//unsigned diffuseMap = LoadTexture("container2.png");
 	//unsigned specularMap = LoadTexture("lighting_maps_specular_color.png");
-	unsigned specularMap = LoadTexture("container2_specular.png");
-	//===========================================
+	//unsigned specularMap = LoadTexture("container2_specular.png");
+	////===========================================
 
+	Texture emissiomMap,diffuseMap,specularMap;
+	diffuseMap.initTexture("container2.png");
+	emissiomMap.initTexture("matrix.jpg"); 
+	specularMap.initTexture("container2_specular.png");
+	//emissiomMap.SetFiltering(GL_NEAREST);
+	//emissiomMap.SetMipmapFiltering(GL_LINEAR_MIPMAP_NEAREST);
+	//emissiomMap.SetWrapping(GL_CLAMP_TO_EDGE);
+	
 	glEnable(GL_DEPTH_TEST);
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -154,13 +164,17 @@ int main() {
 		vec3 lightPos = vec3(sin(glfwGetTime()), 1.6f, 2.6f);
 
 		//===========================================
-		glActiveTexture(GL_TEXTURE0);
+		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, emissionMap);
+		glBindTexture(GL_TEXTURE_2D, specularMap);*/
+		//glActiveTexture(GL_TEXTURE2);
+		//glBindTexture(GL_TEXTURE_2D, emissionMap);
 		//=============================================
+		diffuseMap.ActiveAndBind(GL_TEXTURE0);
+		specularMap.ActiveAndBind(GL_TEXTURE1);
+		emissiomMap.ActiveAndBind(GL_TEXTURE2);
+
 
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", myCam.Position);
@@ -239,38 +253,38 @@ int main() {
 	return 0;
 }
 
-int LoadTexture(const char* img_path) {
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+//int LoadTexture(const char* img_path) {
+//	unsigned int texture;
+//	glGenTextures(1, &texture);
+//	glBindTexture(GL_TEXTURE_2D, texture);
+//
+//	int width, height, nrChannels;
+//	unsigned char *data = stbi_load(img_path, &width, &height, &nrChannels,0);
+//	if (data) {
+//		switch (nrChannels){
+//		case 3:
+//			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//			break;
+//		case 4:
+//			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//			break;
+//		}
+//		glGenerateMipmap(GL_TEXTURE_2D);
+//	}else {
+//		cout << "Failed to load texture" << endl;
+//	}
+//
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//
+//	stbi_image_free(data);
+//	return texture;
+//}
 
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load(img_path, &width, &height, &nrChannels,0);
-	if (data) {
-		switch (nrChannels){
-		case 3:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-			break;
-		case 4:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			break;
-		}
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}else {
-		cout << "Failed to load texture" << endl;
-	}
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	stbi_image_free(data);
-	return texture;
-}
-
-void processInput(GLWindow & w)
+void processInput(OpenGLWindow & w)
 {
 	GLFWwindow *pw = w.getWindowPtr();
 	if (glfwGetKey(pw, GLFW_KEY_ESCAPE) == GLFW_PRESS)

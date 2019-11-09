@@ -20,7 +20,7 @@ public:
 	}
 };
 
-class GLWindow {
+class OpenGLWindow {
 private:
 	GLFWwindow *window;
 public:
@@ -32,10 +32,10 @@ public:
 	void swapBuffersAndPollEvents();
 	GLFWwindow* getWindowPtr()const;
 	bool isWindowClosed() const;
-	~GLWindow();
+	~OpenGLWindow();
 };
 
-void GLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
+void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -60,36 +60,36 @@ void GLWindow::initWindow(unsigned int width, unsigned int height, const std::st
 	}
 }
 
-GLWindow::~GLWindow() {
+OpenGLWindow::~OpenGLWindow() {
 	glfwTerminate();
 }
 
-void GLWindow::setCursorDisable() {
+void OpenGLWindow::setCursorDisable() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void GLWindow::setCursorEnable() {
+void OpenGLWindow::setCursorEnable() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-void GLWindow::setCursorPosCallback(GLFWcursorposfun cbfun)  {
+void OpenGLWindow::setCursorPosCallback(GLFWcursorposfun cbfun)  {
 	glfwSetCursorPosCallback(window, cbfun);
 }
 
-void GLWindow::setScrollCallback(GLFWscrollfun cbfun)  {
+void OpenGLWindow::setScrollCallback(GLFWscrollfun cbfun)  {
 	glfwSetScrollCallback(window, cbfun);
 }
 
-bool GLWindow::isWindowClosed() const {
+bool OpenGLWindow::isWindowClosed() const {
 	return glfwWindowShouldClose(window);
 }
 
-void GLWindow::swapBuffersAndPollEvents()  {
+void OpenGLWindow::swapBuffersAndPollEvents()  {
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }
 
-GLFWwindow* GLWindow::getWindowPtr()const {
+GLFWwindow* OpenGLWindow::getWindowPtr()const {
 	return window;
 }
 

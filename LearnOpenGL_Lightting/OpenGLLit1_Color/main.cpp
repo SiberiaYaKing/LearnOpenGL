@@ -76,11 +76,11 @@ Camera myCam(vec3(0, 0, 3));
 
 vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-inline void processInput(GLWindow &);
+inline void processInput(OpenGLWindow &);
 
 int main() {
 	
-	GLWindow window;
+	OpenGLWindow window;
 	try {
 		window.initWindow(SCR_WIDTH,SCR_HEIGHT,"OpenGL_Lighting");
 	}
@@ -170,7 +170,7 @@ int main() {
 	return 0;
 }
 
-void processInput(GLWindow & w)
+void processInput(OpenGLWindow & w)
 {
 	GLFWwindow *pw = w.getWindowPtr();
 	if (glfwGetKey(pw, GLFW_KEY_ESCAPE) == GLFW_PRESS)

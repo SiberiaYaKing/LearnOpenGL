@@ -78,7 +78,7 @@ float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
 Camera myCam(vec3(1.7f, -1.6f, 3));
 
-inline void processInput(GLWindow &);
+inline void processInput(OpenGLWindow &);
 
 vec3 lightColor(1.0f, 1, 1);
 float lightIntencity = 1.0f;
@@ -86,7 +86,7 @@ float lightIntencity = 1.0f;
 
 int main() {
 	
-	GLWindow window;
+	OpenGLWindow window;
 	try {
 		window.initWindow(SCR_WIDTH,SCR_HEIGHT,"OpenGL_Lighting");
 	}
@@ -224,7 +224,7 @@ int main() {
 	return 0;
 }
 
-void processInput(GLWindow & w)
+void processInput(OpenGLWindow & w)
 {
 	GLFWwindow *pw = w.getWindowPtr();
 	if (glfwGetKey(pw, GLFW_KEY_ESCAPE) == GLFW_PRESS)
