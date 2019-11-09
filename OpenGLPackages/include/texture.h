@@ -8,7 +8,7 @@
 class TextureLoadExeception :public std::exception {
 public:
 	const char* what()const throw() {
-		return "Failed to load texture";
+		return "Failed to load texture ";
 	}
 };
 
@@ -18,7 +18,7 @@ public:
 
 	void initTexture(const std::string &img_path) {
 		try { this->_initTexture_(img_path); }
-		catch (TextureLoadExeception tle) { std::cout << tle.what() << std::endl; }
+		catch (TextureLoadExeception tle) { std::cout << tle.what() <<img_path<< std::endl; }
 	}
 
 	void SetWrapping(GLint param = GL_REPEAT) {
