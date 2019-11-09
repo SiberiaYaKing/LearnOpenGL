@@ -154,7 +154,7 @@ int main() {
 		mat4 projection = perspective(radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		mat4 view = myCam.GetViewMatrix();
 		mat4 model = mat4(1.0f);
-		mat3 normalMat = mat3(transpose(inverse(model)));  //法线矩阵
+		mat3 normalMat = mat3(transpose(inverse(model)));  //!!!!法线矩阵要与模型矩阵保持同步刷新
 		vec3 lightPos = vec3(sin(glfwGetTime()), 1.6f, 2.6f);
 		vec3 lc(lightColor.x*intencity, lightColor.y*intencity, lightColor.z*intencity);
 

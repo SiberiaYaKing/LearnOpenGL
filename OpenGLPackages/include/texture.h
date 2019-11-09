@@ -27,7 +27,6 @@ public:
 	}
 
 	void SetFiltering(GLint param = GL_LINEAR) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
 	}
 
@@ -48,22 +47,22 @@ private:
 		glGenTextures(1, &texture);
 		glBindTexture(target, texture);
 
-		SetFiltering();
-		SetWrapping();
-		SetMipmapFiltering();
-
 		int width, height, nrChannels;
 		unsigned char*data = stbi_load(img_path.c_str(), &width, &height, &nrChannels, 0);
 		if (data) {
-			switch (nrChannels) {
-			case 3:
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-				break;
-			case 4:
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-				break;
-			}
+			GLenum format;
+			if (nrChannels == 1)
+				format = GL_RED;
+			else if (nrChannels == 3)
+				format = GL_RGB;
+			else if (nrChannels == 4)
+				format = GL_RGBA;
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
+
+			SetFiltering();
+			SetWrapping();
+			SetMipmapFiltering();
 		}
 		else throw TextureLoadExeception();
 		stbi_image_free(data);
