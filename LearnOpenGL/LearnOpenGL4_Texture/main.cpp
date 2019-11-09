@@ -118,9 +118,6 @@ int main() {
 	//}
 	//stbi_image_free(data);
 
-	ourShader.use();
-	glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); //手动设置
-	ourShader.setInt("texture2", 1);  //或使用着色器类设置
 
 	//渲染循环
 	while (!glfwWindowShouldClose(window)) {
@@ -137,6 +134,10 @@ int main() {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
+
+		ourShader.use();
+		glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); //手动设置
+		ourShader.setInt("texture2", 1);  //或使用着色器类设置
 		ourShader.setFloat("mixValue", mixValue);
 
 		ourShader.use();
