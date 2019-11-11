@@ -93,7 +93,6 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
-bool firstMouse = true;
 Camera myCam(vec3(0, 0, 3));
 
 inline void processInput(OpenGLWindow &);

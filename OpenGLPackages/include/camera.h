@@ -27,6 +27,7 @@ const float ZOOM = 45.0f;
 class Camera
 {
 public:
+	static bool firstMouse;
 	// Camera Attributes
 	glm::vec3 Position;
 	glm::vec3 Front;
@@ -145,3 +146,5 @@ private:
 	}
 };
 #endif
+
+bool Camera::firstMouse = true;

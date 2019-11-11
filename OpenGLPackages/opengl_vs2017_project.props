@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <IncludePath>..\..\OpenGLPackages\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\OpenGLPackages\lib;$(LibraryPath)</LibraryPath>
+    <_PropertySheetDisplayName>opengl_vs2017_project</_PropertySheetDisplayName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;assimp-vc141-mtd-boost-dx64.lib;assimp-vc141-mtd-boost-dx86.lib;glfw3_dx64.lib;glfw3_dx86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
