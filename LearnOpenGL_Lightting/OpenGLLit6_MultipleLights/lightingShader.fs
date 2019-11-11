@@ -77,7 +77,7 @@ void main(){
 vec3 CalcDirLight(DirLight light,vec3 normal,vec3 viewDir,Material mat){
 	vec3 lightDir = normalize(-light.direction);//The direction of the light we use is always the opposite
 	float diff= max(dot(lightDir,normal),0);
-	vec3 reflectDir = reflect(-lightDir,normal);//the direction of lightDir and reflectDir is down ,just like that "\|/"
+	vec3 reflectDir = reflect(-lightDir,normal);//the direction of lightDir  is down but reflectDir is up ,just like that "¨K¡ü¨J".
 	float spec = pow(max(dot(reflectDir,viewDir),0.0),mat.shininess);
 
 	vec3 ambient =light.ambient*vec3(texture(mat.diffuse,TexCoords));
