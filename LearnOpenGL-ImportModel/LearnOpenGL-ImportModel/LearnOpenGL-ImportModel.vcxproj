@@ -125,10 +125,6 @@
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\OpenGLPackages\dll\assimp-vc141-mtd-boost-dx64.dll" />
-    <None Include="..\..\OpenGLPackages\dll\assimp-vc141-mtd-boost-dx86.dll" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

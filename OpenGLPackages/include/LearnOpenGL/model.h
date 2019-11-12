@@ -2,14 +2,14 @@
 
 #include <vector>
 #include <string>
-#include <shader.h>
+#include <LearnOpenGL/shader.h>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <mesh.h>
-#include <texture_loader.h>
+#include <LearnOpenGL/mesh.h>
+#include <LearnOpenGL/texture_loader.h>
 
 //这个类可能存在的问题：可能不支持默认没有纹理的模型
 
@@ -24,6 +24,9 @@ private:
 	std::vector<Texture> textures_loaded;
 public:
 	Model(const char *path) {
+		loadModel(path);
+	}
+	Model(const std::string &path) {
 		loadModel(path);
 	}
 	void Draw(Shader shader);
@@ -82,7 +85,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 		vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 		vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 		if(mesh->mTextureCoords[0])
-			vertex.TexCoords = glm::vec2(mesh->mTextureCoords[i]->x, mesh->mTextureCoords[i]->y);
+			vertex.TexCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 		else vertex.TexCoords = glm::vec2(0.0f);
 		vertices.push_back(vertex);
 	}
@@ -90,7 +93,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 		aiFace face = mesh->mFaces[i];  //由索引形成的面，三角形就是三个索引
 		//处理索引
-		for (unsigned int j = 0; i < face.mNumIndices; j++)
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
 	//处理材质

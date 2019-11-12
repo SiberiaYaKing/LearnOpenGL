@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <shader.h>
+#include <LearnOpenGL/shader.h>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>

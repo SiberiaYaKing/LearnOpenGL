@@ -16,9 +16,6 @@
     <Filter Include="源文件\imgui">
       <UniqueIdentifier>{dd76c848-f410-4a93-a71c-4d2c6700bd3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\assimp">
-      <UniqueIdentifier>{102dce5a-1e37-4435-97f3-e23dc2487756}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\OpenGLPackages\src\glad.c">
@@ -42,13 +39,5 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\OpenGLPackages\dll\assimp-vc141-mtd-boost-dx64.dll">
-      <Filter>源文件\assimp</Filter>
-    </None>
-    <None Include="..\..\OpenGLPackages\dll\assimp-vc141-mtd-boost-dx86.dll">
-      <Filter>源文件\assimp</Filter>
-    </None>
   </ItemGroup>
 </Project>
