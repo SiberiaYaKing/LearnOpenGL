@@ -18,12 +18,6 @@
     <None Include="lightingShader.vs">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="lampShader.fs">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="lampShader.vs">
-      <Filter>资源文件</Filter>
-    </None>
     <None Include="lightingShader.fs">
       <Filter>资源文件</Filter>
     </None>

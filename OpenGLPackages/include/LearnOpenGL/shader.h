@@ -17,6 +17,7 @@ public:
 
 	// 构造器读取并构建着色器
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader(const std::string& vertexPath, const std::string& fragmentPath);
 	// 使用/激活程序
 	void use();
 	// uniform工具函数
@@ -27,10 +28,11 @@ public:
 	void setVec3(const std::string &name, glm::vec3 value) const;
 	void setVec3(const std::string &name, float f1,float f2,float f3) const;
 	void setMat3(const std::string &name, glm::mat3 value)const;
+private:
+	void init_shader(const GLchar* vertexPath, const GLchar*  fragmentPath);
 };
 
-
-Shader::Shader(const GLchar* vertexPath, const GLchar*  fragmentPath) {
+void Shader::init_shader(const GLchar* vertexPath, const GLchar*  fragmentPath) {
 	//1.从文件路径中获取顶点/片元着色器
 	std::string vertexCode;
 	std::string fragmentCode;
@@ -71,7 +73,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar*  fragmentPath) {
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-		std::cout<<"ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 	//片元着色器
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -95,6 +97,14 @@ Shader::Shader(const GLchar* vertexPath, const GLchar*  fragmentPath) {
 	//删除着色器，它们已经链接到我们的程序中了，不需要了
 	glDeleteShader(vertex);
 	glDeleteShader(vertex);
+}
+
+Shader::Shader(const GLchar* vertexPath, const GLchar*  fragmentPath) {
+	init_shader(vertexPath, fragmentPath);
+}
+
+Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
+	init_shader(vertexPath.c_str(), fragmentPath.c_str());
 }
 
 void Shader::use() {

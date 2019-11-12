@@ -1,19 +1,12 @@
 #pragma once
-
 #include <vector>
 #include <string>
 #include <shader.h>
+#include <iostream>
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
-//这个类可能存在的问题：
-//1.顶点属性数组在构造函数中直接拷贝
-//2.着色器纹理不能动态绑定
-//3.可能不支持默认没有纹理的模型
-
+//这个类可能存在的问题：着色器纹理不能动态绑定
 
 struct Vertex {
 	glm::vec3 Position;
@@ -24,7 +17,10 @@ struct Vertex {
 struct Texture {
 	unsigned int id;
 	std::string type;
+	aiString path;
 };
+
+
 
 class Mesh {
 public:
@@ -38,27 +34,11 @@ public:
 private:
 	//渲染数据
 	unsigned int VAO, VBO, EBO;
-	
+
 	void setupMesh();
 };
 
-class Model {
-public:
-	//函数
-	Model(char *path) {
-		loadModel(path);
-	}
-	void Draw(Shader shader);
-private:
-	std::vector<Mesh> meshes;
-	std::string directory;
-
-	void loadModel(std::string path);
-	void processNode(aiNode *node, const aiScene *scene);
-	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
-
-};
+//------------------------------------------------------------------
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
 	this->vertices = vertices;
@@ -111,4 +91,4 @@ void Mesh::Draw(Shader shader) {
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
-
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -3,10 +3,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <shader.h>
-#include <camera.h>
-#include <opengl_window.h>
-#include <string>
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/camera.h>
+#include <LearnOpenGL/opengl_window.h>
+#include <LearnOpenGL/assets_directory.h>
+#include <LearnOpenGL/texture_loader.h>
 
 #include <iostream>
 #include <math.h>
@@ -21,7 +22,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
-#include <texture_loader.h>
+
 
 using namespace std;
 using namespace glm;
@@ -138,8 +139,8 @@ int main() {
 		return -1;
 	}
 
-	Shader lightingShader("lightingShader.vs", "lightingShader.fs");
-	Shader lampShader("lampShader.vs", "lampShader.fs");
+	Shader lightingShader(dir_shaders+"lightingShader.vs", dir_shaders+"lightingShader.fs");
+	Shader lampShader(dir_shaders+"lampShader.vs", dir_shaders+"lampShader.fs");
 
 	unsigned cubeVAO, VBO,lightVAO;
 	glGenBuffers(1, &VBO);
@@ -162,9 +163,9 @@ int main() {
 	glEnableVertexAttribArray(0);
 
 	TextureLoader emissiomMap,diffuseMap,specularMap,filmMap;
-	diffuseMap.initTexture("container2.png"); 
-	specularMap.initTexture("container2_specular.png");
-	filmMap.initTexture("matrix.jpg");
+	diffuseMap.initTexture(dir_textures+"container2.png"); 
+	specularMap.initTexture(dir_textures+"container2_specular.png");
+	filmMap.initTexture(dir_textures+"matrix.jpg");
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -267,7 +268,7 @@ int main() {
 		for (unsigned int i = 0; i < 10; i++) {
 			model = mat4(1.0f);
 			model = translate(model, cubePositions[i]);
-			float angle = 20.0*i;
+			float angle = 20.0*(i+1)*glfwGetTime();
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			//坑!!!法线矩阵需要和模型矩阵同时计算
 			//mat3 normalMat = mat3(transpose(inverse(model)));

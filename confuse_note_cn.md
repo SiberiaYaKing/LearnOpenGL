@@ -31,3 +31,7 @@
 * 然后就是记住，右手opengl,左手directx
 * 叉乘结果方向: 螺旋定则，即AxB ，四指向外代表A向量，手掌到手腕代表B向量，四指向掌心弯曲，伸出大拇指，大拇指方向即为叉乘方向，opengl用右手，directx用左手
 * 面法线的计算：用于culloff判定，三角形面三顶点可以形成两个相交向量，它们的叉乘方向就是法线的方向，所以才说面法线方向也遵守螺旋定则，本质也是叉乘
+
+## 6.Assimp的数据结构图
+* 我感觉可以把Scene理解为node的寻址器，node对应的所有资源都可以通过索引来获取。
+![](https://learnopengl-cn.github.io/img/03/01/assimp_structure.png)

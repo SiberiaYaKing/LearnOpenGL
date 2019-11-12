@@ -26,20 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="container2.png">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="container2_specular.png">
-      <Filter>资源文件</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="lampShader.fs">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="lampShader.vs">
-      <Filter>资源文件</Filter>
-    </None>
     <None Include="lightingShader.fs">
       <Filter>资源文件</Filter>
     </None>

@@ -51,9 +51,4 @@
       <Filter>源文件\assimp</Filter>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="model_import.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
 </Project>

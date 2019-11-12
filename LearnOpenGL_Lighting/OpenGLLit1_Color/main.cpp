@@ -3,8 +3,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <shader.h>
-#include <camera.h>
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/camera.h>
+#include <LearnOpenGL/opengl_window.h>
+#include <LearnOpenGL/assets_directory.h>
 
 #include <iostream>
 #include <math.h>
@@ -15,7 +17,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <opengl_window.h>
+
 
 using namespace std;
 using namespace glm;
@@ -122,7 +124,7 @@ int main() {
 	glEnableVertexAttribArray(0);
 
 	Shader lightingShader("lightingShader.vs","lightingShader.fs");
-	Shader lampShader("lampShader.vs", "lampShader.fs");
+	Shader lampShader(dir_shaders+"lampShader.vs", dir_shaders+"lampShader.fs");
 
 
 	glEnable(GL_DEPTH_TEST);

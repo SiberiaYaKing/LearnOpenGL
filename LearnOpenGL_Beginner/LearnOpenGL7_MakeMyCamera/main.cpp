@@ -1,9 +1,12 @@
 
 
-#include <camera.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <shader.h>
+
+#include <LearnOpenGL/camera.h>
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/assets_directory.h>
 
 #include <iostream>
 #include <math.h>
@@ -125,8 +128,8 @@ int main() {
 	unsigned int * vids =loadVertex();
 	VAO = vids[0];
 	VBO = vids[1];
-	texture1= loadTexture("container.jpg", "jpg");
-	texture2= loadTexture("awesomeface.png", "png");
+	texture1= loadTexture((dir_textures+"container.jpg").c_str(), "jpg");
+	texture2= loadTexture((dir_textures+"awesomeface.png").c_str(), "png");
 
 	ourShader.use();
 	ourShader.setInt("texture1", 0);

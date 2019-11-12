@@ -3,9 +3,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <shader.h>
-#include <camera.h>
-#include <opengl_window.h>
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/camera.h>
+#include <LearnOpenGL/opengl_window.h>
+#include <LearnOpenGL/texture_loader.h>
+#include <LearnOpenGL/assets_directory.h>
 
 #include <iostream>
 #include <math.h>
@@ -19,7 +21,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
-#include <texture_loader.h>
+
 
 using namespace std;
 using namespace glm;
@@ -101,7 +103,7 @@ int main() {
 	}
 
 	Shader lightingShader("lightingShader.vs", "lightingShader.fs");
-	Shader lampShader("lampShader.vs", "lampShader.fs");
+	Shader lampShader(dir_shaders+"lampShader.vs",dir_shaders+"lampShader.fs");
 
 	unsigned cubeVAO, VBO,lightVAO;
 	glGenBuffers(1, &VBO);
@@ -131,9 +133,9 @@ int main() {
 	////===========================================
 
 	TextureLoader emissiomMap,diffuseMap,specularMap;
-	diffuseMap.initTexture("container2.png");
-	emissiomMap.initTexture("matrix.jpg"); 
-	specularMap.initTexture("container2_specular.png");
+	diffuseMap.initTexture(dir_textures+"container2.png");
+	emissiomMap.initTexture(dir_textures+"matrix.jpg"); 
+	specularMap.initTexture(dir_textures+"container2_specular.png");
 	//emissiomMap.SetFiltering(GL_NEAREST);
 	//emissiomMap.SetMipmapFiltering(GL_LINEAR_MIPMAP_NEAREST);
 	//emissiomMap.SetWrapping(GL_CLAMP_TO_EDGE);

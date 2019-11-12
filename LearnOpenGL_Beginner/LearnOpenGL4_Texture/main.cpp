@@ -2,7 +2,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <shader.h>
+
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/assets_directory.h>
 
 #include <iostream>
 #include <math.h>
@@ -57,8 +59,8 @@ int main() {
 
 	unsigned int VAO,texture1,texture2;
 	loadVertex(VAO);
-	loadTexture(texture1,"container.jpg","jpg");
-	loadTexture(texture2, "awesomeface.png","png");
+	loadTexture(texture1,(dir_textures+"container.jpg").c_str(),"jpg");
+	loadTexture(texture2,(dir_textures+"awesomeface.png").c_str(),"png");
 
 	//// texture 1
 	//// ---------

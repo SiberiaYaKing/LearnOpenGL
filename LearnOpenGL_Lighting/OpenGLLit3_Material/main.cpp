@@ -3,9 +3,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <shader.h>
-#include <camera.h>
-#include <opengl_window.h>
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/camera.h>
+#include <LearnOpenGL/opengl_window.h>
+#include <LearnOpenGL/assets_directory.h>
 
 #include <iostream>
 #include <math.h>
@@ -16,8 +17,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 
 
 using namespace std;
@@ -111,7 +112,7 @@ int main() {
 	}
 
 	Shader lightingShader("lightingShader.vs", "lightingShader.fs");
-	Shader lampShader("lampShader.vs", "lampShader.fs");
+	Shader lampShader(dir_shaders+"lampShader.vs", dir_shaders+"lampShader.fs");
 
 	unsigned cubeVAO, VBO,lightVAO;
 	glGenBuffers(1, &VBO);

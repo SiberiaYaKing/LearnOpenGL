@@ -16,6 +16,10 @@ class TextureLoader {
 public:
 	TextureLoader(GLenum target = GL_TEXTURE_2D) :target(target) {}
 
+	TextureLoader(const std::string &img_path, GLenum target = GL_TEXTURE_2D) :target(target) {
+		initTexture(img_path);
+	}
+
 	void initTexture(const std::string &img_path) {
 		try { this->_initTexture_(img_path); }
 		catch (TextureLoadExeception tle) { std::cout << tle.what() <<img_path<< std::endl; }
@@ -37,6 +41,10 @@ public:
 	void ActiveAndBind(GLenum texcoord) {
 		glActiveTexture(texcoord);
 		glBindTexture(target, texture);
+	}
+
+	unsigned int getTextureID() {
+		return  texture;
 	}
 
 private:

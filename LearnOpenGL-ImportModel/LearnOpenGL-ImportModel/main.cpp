@@ -3,10 +3,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <shader.h>
-#include <camera.h>
-#include <opengl_window.h>
-#include <string>
+#include <LearnOpenGL/shader.h>
+#include <LearnOpenGL/camera.h>
+#include <LearnOpenGL/opengl_window.h>
 
 #include <iostream>
 #include <math.h>
