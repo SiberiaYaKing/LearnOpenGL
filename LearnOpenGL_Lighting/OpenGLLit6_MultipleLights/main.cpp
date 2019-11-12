@@ -21,7 +21,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
-#include <texture.h>
+#include <texture_loader.h>
 
 using namespace std;
 using namespace glm;
@@ -161,7 +161,7 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	Texture emissiomMap,diffuseMap,specularMap,filmMap;
+	TextureLoader emissiomMap,diffuseMap,specularMap,filmMap;
 	diffuseMap.initTexture("container2.png"); 
 	specularMap.initTexture("container2_specular.png");
 	filmMap.initTexture("matrix.jpg");

@@ -12,9 +12,9 @@ public:
 	}
 };
 
-class Texture {
+class TextureLoader {
 public:
-	Texture(GLenum target = GL_TEXTURE_2D) :target(target) {}
+	TextureLoader(GLenum target = GL_TEXTURE_2D) :target(target) {}
 
 	void initTexture(const std::string &img_path) {
 		try { this->_initTexture_(img_path); }

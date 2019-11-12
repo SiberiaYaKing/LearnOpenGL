@@ -19,7 +19,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
-#include <texture.h>
+#include <texture_loader.h>
 
 using namespace std;
 using namespace glm;
@@ -130,7 +130,7 @@ int main() {
 	//unsigned specularMap = LoadTexture("container2_specular.png");
 	////===========================================
 
-	Texture emissiomMap,diffuseMap,specularMap;
+	TextureLoader emissiomMap,diffuseMap,specularMap;
 	diffuseMap.initTexture("container2.png");
 	emissiomMap.initTexture("matrix.jpg"); 
 	specularMap.initTexture("container2_specular.png");
