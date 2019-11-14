@@ -46,3 +46,6 @@
 - path = ..\\..\\OpenGLPackages\\dlls\\dlls_x86
 * 在单个项目属性->配置属性->调试->环境中设置
 * 由于这个仓库的项目都是debug开发模式，所以可以将这两个目录配置到系统的环境变量中，这样项目就能引用到dll
+
+## 9.imgui 1.60 版本的坑
+* 使用imgui 1.60会使glfw的鼠标滚轮回调(glfwSetScrollCallback)失效

@@ -27,7 +27,8 @@ const float ZOOM = 45.0f;
 class Camera
 {
 public:
-	static bool firstMouse;
+	bool firstMouse = true;
+	bool mouse_ctrl = true;
 	// Camera Attributes
 	glm::vec3 Position;
 	glm::vec3 Front;
@@ -76,11 +77,9 @@ public:
 		}
 		updateCameraVectors();
 	}
-
 	void SetPosition(glm::vec3 posOffset) {
 		Position =  posOffset; // Front * posOffset.z + Right * posOffset.x + Up * posOffset.y;
 	}
-
 	void SetZoom(float zoom) {
 		Zoom = zoom;
 	}
@@ -104,33 +103,37 @@ public:
 	// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
 	{
-		xoffset *= MouseSensitivity;
-		yoffset *= MouseSensitivity;
+		if (mouse_ctrl) {
+			xoffset *= MouseSensitivity;
+			yoffset *= MouseSensitivity;
 
-		Yaw += xoffset;
-		Pitch += yoffset;
+			Yaw += xoffset;
+			Pitch += yoffset;
 
-		// Make sure that when pitch is out of bounds, screen doesn't get flipped
-		if (constrainPitch){
-			if (Pitch > 89.0f) Pitch = 89.0f;
-			if (Pitch < -89.0f) Pitch = -89.0f;
+			// Make sure that when pitch is out of bounds, screen doesn't get flipped
+			if (constrainPitch) {
+				if (Pitch > 89.0f) Pitch = 89.0f;
+				if (Pitch < -89.0f) Pitch = -89.0f;
+			}
+			// Update Front, Right and Up Vectors using the updated Euler angles
+			updateCameraVectors();
 		}
-		// Update Front, Right and Up Vectors using the updated Euler angles
-		updateCameraVectors();
 	}
 
 	// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
 	void ProcessMouseScroll(float yoffset)
 	{
-		if (Zoom >= 1.0f && Zoom <= 60.0f)
-			Zoom -= yoffset;
-		if (Zoom <= 1.0f)
-			Zoom = 1.0f;
-		if (Zoom >= 60.0f)
-			Zoom = 60.0f;
+		if (mouse_ctrl) {
+			if (Zoom >= 1.0f && Zoom <= 60.0f)
+				Zoom -= yoffset;
+			if (Zoom <= 1.0f)
+				Zoom = 1.0f;
+			if (Zoom >= 60.0f)
+				Zoom = 60.0f;
+		}
+
 	}
 
-private:
 	// Calculates the front vector from the Camera's (updated) Euler Angles
 	void updateCameraVectors()
 	{
@@ -147,4 +150,5 @@ private:
 };
 #endif
 
-bool Camera::firstMouse = true;
+//当firstMouse是static的时候
+//bool Camera::firstMouse = true;

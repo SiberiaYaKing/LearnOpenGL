@@ -80,6 +80,7 @@ float lastFrame = 0.0f;
 
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 Camera myCam(vec3(0, 0, 3));
+bool mouse_ctrl;
 
 inline void processInput(OpenGLWindow &);
 inline void setDirLight(Shader shader);
@@ -125,19 +126,20 @@ int main() {
 		cout << e.what() << endl;
 		return -1;
 	}
-	//window.setCursorDisable();
-	//window.setCursorPosCallback([](GLFWwindow* window, double xpos, double ypos) {
-	//	if (Camera::firstMouse) {
-	//		lastX = xpos;
-	//		lastY = ypos;
-	//		Camera::firstMouse = false;
-	//	}
-	//	float xoffset = xpos - lastX;
-	//	float yoffset = lastY - ypos;
-	//	lastX = xpos;
-	//	lastY = ypos;
-	//	myCam.ProcessMouseMovement(xoffset, yoffset);
-	//});
+	window.setCursorEnable();
+	window.setCursorPosCallback([](GLFWwindow* window, double xpos, double ypos) {
+		if (myCam.firstMouse) {
+			lastX = xpos;
+			lastY = ypos;
+			myCam.firstMouse = false;
+		}
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos;
+		lastX = xpos;
+		lastY = ypos;
+		myCam.ProcessMouseMovement(xoffset, yoffset);
+	});
+	//imgui 1.60的bug，这个函数会失效
 	//window.setScrollCallback([](GLFWwindow *window, double xoffset, double yoffset) {
 	//	myCam.ProcessMouseScroll(yoffset);
 	//});
@@ -230,6 +232,16 @@ void processInput(OpenGLWindow & w)
 		myCam.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(pw, GLFW_KEY_D) == GLFW_PRESS)
 		myCam.ProcessKeyboard(RIGHT, deltaTime);
+	if(glfwGetMouseButton(pw,GLFW_MOUSE_BUTTON_2)==GLFW_PRESS)
+		if (!myCam.mouse_ctrl) {
+			w.setCursorDisable();
+			myCam.mouse_ctrl = true;
+		}
+	if (glfwGetMouseButton(pw, GLFW_MOUSE_BUTTON_2) == GLFW_RELEASE)
+		if (myCam.mouse_ctrl) {
+			w.setCursorEnable();
+			myCam.mouse_ctrl = false;
+		}
 }
 
 
@@ -278,8 +290,7 @@ void setSpotLight(Shader shader) {
 
 void Drawlamp(Shader lampShader,mat4 model,mat4 projection,mat4 view,unsigned lightVAO){
 	for (int i = 0; i < sizeof(pointLightPositions) / sizeof(pointLightPositions[0]) && isPointLight; i++) {
-		//pointLight
-		model = mat4(1.0f);  //清空model为单位阵
+		model = mat4(1.0f); 
 		model = translate(model, pointLightPositions[i]);
 		model = scale(model, vec3(0.2f)); // a smaller cube
 		lampShader.use();
@@ -296,19 +307,13 @@ void DrawGUI(){
 	ImGui_ImplGlfwGL3_NewFrame();
 	{
 		ImGui::Begin("Tools");
-		static float yaw = -90;
-		static float pitch = 0.0f;
-		static float zoom = 45.0f;
-		//static vec3 position{2.15f,0.7f,3.5f};
 		ImGui::Text("Camera Parama");
-		ImGui::SliderFloat("Yaw", &yaw, -180, 180);
-		ImGui::SliderFloat("Pitch", &pitch, -89.0f, 89.0f);
-		myCam.SetRotation(yaw, pitch);
-		ImGui::Text("Use 'WSAD' to control the Camera movement");
-		//ImGui::DragFloat3("Position", value_ptr(position), 0.05f);
-		//myCam.SetPosition(position);
-		ImGui::SliderFloat("Zoom", &zoom, 0.0f, 60.0f);
-		myCam.SetZoom(zoom);
+		ImGui::DragFloat("Yaw", &myCam.Yaw, 0.5f);
+		ImGui::DragFloat("Pitch", &myCam.Pitch, 0.5f ,-89.0f, 89.0f);
+		ImGui::DragFloat3("Position", value_ptr(myCam.Position), 0.05f);
+		ImGui::Text("Because the bug of imgui 1.60,scroll can't change zoom");
+		ImGui::SliderFloat("Zoom", &myCam.Zoom, 0.0f, 60.0f);
+		if (!myCam.mouse_ctrl) myCam.updateCameraVectors();
 		ImGui::Text("Light Selecter");
 		ImGui::Checkbox("Open Direction Light", &isDirLight);
 		ImGui::Checkbox("Open Point Light", &isPointLight);
