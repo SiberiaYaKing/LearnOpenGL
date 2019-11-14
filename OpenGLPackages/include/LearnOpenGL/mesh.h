@@ -30,6 +30,25 @@ public:
 	std::vector<Texture> textures;
 
 	Mesh(std::vector<Vertex>, std::vector<unsigned int>, std::vector<Texture>);
+
+
+	class MeshGC {
+	private:
+		std::vector<unsigned int> VAOs, VBOs, EBOs;
+	public:
+		void add_id(unsigned VAO, unsigned VBO, unsigned EBO) {
+			VAOs.push_back(VAO);
+			VBOs.push_back(VBO);
+			EBOs.push_back(EBO);
+		}
+		~MeshGC() {
+			for (int i = 0; i < VAOs.size(); i++) {
+				glDeleteVertexArrays(1, &VAOs[i]);
+				glDeleteBuffers(1, &VBOs[i]);
+				glDeleteBuffers(1, &EBOs[i]);
+			}
+		}
+	};
 	void Draw(Shader shader);
 private:
 	//渲染数据
@@ -67,28 +86,43 @@ void Mesh::setupMesh() {
 	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0); //解绑
+
+	static MeshGC gc;
+	gc.add_id(VAO, VBO, EBO);
 }
 
 void Mesh::Draw(Shader shader) {
-	unsigned int diffuseNr = 1;
-	unsigned int specularNr = 1;
-	for (unsigned int i = 0; i < textures.size(); i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		std::string number;
-		std::string name = textures[i].type;
-		if (name == "texture_diffuse")
-			number = std::to_string(diffuseNr++);
-		else if (name == "texture_specular")
-			number = std::to_string(specularNr++);
-
-		shader.setFloat(("material." + name + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+	unsigned int diffuseNr = 0;
+	unsigned int specularNr = 0;
+	shader.use();
+	if (textures.size()) {
+		shader.setBool("has_texture", true);
+		for (unsigned int i = 0; i < textures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			std::string number;
+			std::string name = textures[i].type;
+			if (name == "texture_diffuse")
+				number = std::to_string(diffuseNr++);
+			else if (name == "texture_specular") {
+				float shininess = 0.25f;
+				number = std::to_string(specularNr++);
+				shader.setFloat("shininess", shininess*128.0f);
+			}
+			shader.setInt( name + number, i);
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		}
+		glActiveTexture(GL_TEXTURE0);   //设置纹理单元为默认值
 	}
-	glActiveTexture(GL_TEXTURE0);
+	else {
+		shader.setBool("has_texture", false);
+		float shininess = 0.25f;
+		shader.setFloat("shininess", shininess*128.0f);
+	}
+
 
 	//绘制网格
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	glBindVertexArray(0); //解绑
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
