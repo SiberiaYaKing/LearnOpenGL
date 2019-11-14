@@ -35,3 +35,10 @@
 ## 6.Assimp的数据结构图
 * 我感觉可以把Scene理解为node的寻址器，node对应的所有资源都可以通过索引来获取。
 ![](https://learnopengl-cn.github.io/img/03/01/assimp_structure.png)
+
+## 7.纹理的坑
+* 单个纹理的情况下，它的采样器(sampler=0)与纹理单元(GL_TEXTURE0)是有默认值的，不用手动设置，在多纹理的情况下则需要激活纹理单元(glActiveTexure)，并设置采样器(shader.setInt("sampler",value))。
+* 纹理采样器为空的情况下，glsl的纹理采样函数(texture)会采样失败，而且这种失败是无法检测到，只能通过在外部传入一个bool值到着色器，以此来判断采样器是否为空。
+
+## 8.dll目录的设置
+* 本仓库的dll相对目录为：..\..\OpenGLPackages\dll\x64 和 ..\..\OpenGLPackages\dll\x86,在单个项目属性->配置属性->调试->环境中设置，但目前最好的做法是将这个路径写在系统环境变量中，然后把环境变量设置到项目属性中就比较方便。
