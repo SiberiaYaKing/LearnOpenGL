@@ -56,7 +56,7 @@ uniform SpotLight spotLight;
 
 uniform	sampler2D texture_diffuse1;
 uniform	sampler2D texture_specular1;
-uniform	bool has_texture;
+uniform	bool has_texture=true;
 uniform	float shininess;
 
 
