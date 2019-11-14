@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <IncludePath>..\..\OpenGLPackages\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\OpenGLPackages\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\OpenGLPackages\libs;$(LibraryPath)</LibraryPath>
     <_PropertySheetDisplayName>opengl_vs2017_project</_PropertySheetDisplayName>
   </PropertyGroup>
   <ItemDefinitionGroup>

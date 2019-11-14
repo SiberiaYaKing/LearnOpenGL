@@ -7,16 +7,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LearnOpenGL-ImportModel", "
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Debug|Win32.Build.0 = Debug|Win32
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Debug|x64.ActiveCfg = Debug|x64
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Debug|x64.Build.0 = Debug|x64
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Debug|x86.ActiveCfg = Debug|Win32
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Debug|x86.Build.0 = Debug|Win32
+		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Release|Win32.ActiveCfg = Release|Win32
+		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Release|Win32.Build.0 = Release|Win32
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Release|x64.ActiveCfg = Release|x64
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Release|x64.Build.0 = Release|x64
 		{D346488E-D8F3-4EA3-A4D2-2B06056B5DF0}.Release|x86.ActiveCfg = Release|Win32
