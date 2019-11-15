@@ -20,10 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{FB4CA96D-A067-4F25-AA8D-DD3E8A702013}</ProjectGuid>
-    <RootNamespace>AdvanceOpenglDepthTesting</RootNamespace>
+    <ProjectGuid>{6672711F-0DA3-42EF-9754-1B39BC7E5CE6}</ProjectGuid>
+    <RootNamespace>AdvanceOpenGLBlending</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>AdvanceOpenGL_1DepthTesting</ProjectName>
+    <ProjectName>AdvanceOpenGL_3Blending</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -73,7 +73,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -81,7 +81,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -124,7 +124,7 @@
     <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp" />
-    <ClCompile Include="DepthTesting_mian.cpp" />
+    <ClCompile Include="Blending_main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

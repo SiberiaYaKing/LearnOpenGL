@@ -14,14 +14,11 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="源文件\imgui">
-      <UniqueIdentifier>{41ad26e1-df85-4390-b792-e2575db58106}</UniqueIdentifier>
+      <UniqueIdentifier>{cbeba8c1-051a-44e4-850d-3bfa2a89c3a0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\OpenGLPackages\src\glad.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp">
+    <ClCompile Include="StencilTesting_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui.cpp">
@@ -36,7 +33,10 @@
     <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_impl_glfw_gl3.cpp">
       <Filter>源文件\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="DepthTesting_mian.cpp">
+    <ClCompile Include="..\..\OpenGLPackages\src\glad.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

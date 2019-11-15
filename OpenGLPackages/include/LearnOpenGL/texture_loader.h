@@ -69,7 +69,7 @@ private:
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 			SetFiltering();
-			SetWrapping();
+			SetWrapping(format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 			SetMipmapFiltering();
 		}
 		else throw TextureLoadExeception();
