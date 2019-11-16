@@ -20,8 +20,8 @@ void processInput(GLFWwindow *window);
 unsigned int loadTexture(const char *path);
 
 // settings
-const unsigned int SCR_WIDTH = 1280;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -76,14 +76,10 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_ALWAYS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
 	//glDepthFunc(GL_LESS);  //less is defalut value;
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xff);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
 	// build and compile shaders
 	// -------------------------
 	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing.fs");
-	Shader shaderSingleColor(dir_shaders + "AdvanceOpenGL/depth_testing.vs", dir_shaders + "AdvanceOpenGL/stencil_testing.fs");
+	Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -141,6 +137,16 @@ int main()
 		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
 		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
 	};
+	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+	// positions   // texCoords
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f,  0.0f, 0.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+	 1.0f,  1.0f,  1.0f, 1.0f
+	};
 	// cube VAO
 	unsigned int cubeVAO, cubeVBO;
 	glGenVertexArrays(1, &cubeVAO);
@@ -165,16 +171,65 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glBindVertexArray(0);
+	//Screen VAO
+	unsigned int screenVAO, screenVBO;
+	glGenVertexArrays(1, &screenVAO);
+	glGenBuffers(1, &screenVBO);
+	glBindVertexArray(screenVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glBindVertexArray(0);
+
 
 	// load textures
 	// -------------
-	unsigned int cubeTexture = loadTexture((dir_textures+"marble.jpg").c_str());
+	unsigned int cubeTexture = loadTexture((dir_textures+"container.jpg").c_str());
 	unsigned int floorTexture = loadTexture((dir_textures+"metal.png").c_str());
 
 	// shader configuration
 	// --------------------
-	//shader.use();
-	//shader.setInt("texture1", 0);
+	shader.use();
+	shader.setInt("texture1", 0);
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
+
+
+	// frame buffer
+	//-------------------------
+	//生成帧缓冲
+	unsigned int framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	//生成纹理
+	unsigned int texColorBuffer;
+	glGenTextures(1, &texColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);  //reset
+	//附加到帧缓冲
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+	
+	//render buffer
+	//------------------------
+	//生成并设置渲染缓冲
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0); //reset
+	//附加到缓冲
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	//检查帧缓冲是否完整
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); //reset
+
 
 	// render loop
 	// -----------
@@ -189,38 +244,24 @@ int main()
 		// input
 		// -----
 		processInput(window);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// render
 		// ------
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // don't forget to clear the stencil buffer!
-
-		/* set uniforms*/
-		shaderSingleColor.use();
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		shaderSingleColor.setMat4("view", view);
-		shaderSingleColor.setMat4("projection", projection);
-		shader.use();
-		shader.setMat4("view", view);
-		shader.setMat4("projection", projection);
-
-		/*地板不写入模板缓冲*/ {
-			glStencilMask(0x00);
-			// floor
-			glBindVertexArray(planeVAO);
-			glBindTexture(GL_TEXTURE_2D, floorTexture);
-			shader.setMat4("model", glm::mat4(1.0f));
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindVertexArray(0);
+		/*切换到自定义帧缓冲*/ {
+			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+			glEnable(GL_DEPTH_TEST);
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
-		// 1st. render pass, draw objects as normal, writing to the stencil buffer
-		// --------------------------------------------------------------------
-		/*将cube片段的模板缓冲设为1，并绘制cube*/ {
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilMask(0xFF);
+		/*Draw others*/{
+			shader.use();
+			glm::mat4 model = glm::mat4(1.0f);
+			glm::mat4 view = camera.GetViewMatrix();
+			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+			shader.setMat4("view", view);
+			shader.setMat4("projection", projection);
 			// cubes
 			glBindVertexArray(cubeVAO);
 			glActiveTexture(GL_TEXTURE0);
@@ -232,33 +273,26 @@ int main()
 			model = glm::translate(model, glm::vec3(2.0f, 0.001f, 0.0f));
 			shader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
+			// floor
+			glBindVertexArray(planeVAO);
+			glBindTexture(GL_TEXTURE_2D, floorTexture);
+			shader.setMat4("model", glm::mat4(1.0f));
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
 		}
 
+		/*切换到默认帧缓冲*/{
+			glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+			glClearColor(1.0f, 1.0f, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
 
-		// 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-		// Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not drawn, thus only drawing 
-		// the objects' size differences, making it look like borders.
-		// -----------------------------------------------------------------------------------------------------------------------------
-		/*判断模板不为0的部分绘制，关闭模板写入为了让边框渲染在模板为0的部分(即cube周围)，关闭深度写入为了让边框渲染在地板上面*/ {
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-			glStencilMask(0x00);
+		/*将自定义framebuffer渲染到默认帧缓冲*/{
+			screenShader.use();
+			glBindVertexArray(screenVAO);
 			glDisable(GL_DEPTH_TEST);
-			shaderSingleColor.use();
-			float scale = 1.03;
-			// cubes
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(-1.0f, 0.001f, -1.0f));
-			model = glm::scale(model, glm::vec3(scale, scale, scale));
-			shaderSingleColor.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(2.0f, 0.001f, 0.0f));
-			model = glm::scale(model, glm::vec3(scale, scale, scale));
-			shaderSingleColor.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glBindVertexArray(0);
-			glStencilMask(0xFF);  //记得将一些设置恢复原状
-			glEnable(GL_DEPTH_TEST);
+			glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
 
@@ -370,3 +404,5 @@ unsigned int loadTexture(char const *path)
 
 	return textureID;
 }
+
+
