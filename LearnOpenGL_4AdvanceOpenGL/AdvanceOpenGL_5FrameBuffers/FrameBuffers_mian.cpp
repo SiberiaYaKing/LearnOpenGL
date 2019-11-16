@@ -79,7 +79,10 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing.fs");
-	Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer.fs");
+	//Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer.fs");
+	//Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/inversion.fs");
+	//Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/grayscale.fs");
+	Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/kernel_processing.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -211,13 +214,15 @@ int main()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glBindTexture(GL_TEXTURE_2D, 0);  //reset
 	//附加到帧缓冲
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
 	
 	//render buffer
 	//------------------------
-	//生成并设置渲染缓冲
+	//针对深度缓冲和模板缓冲不用采样的优化手段，生成并设置渲染缓冲
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
