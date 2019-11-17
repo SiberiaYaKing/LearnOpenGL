@@ -191,9 +191,9 @@ int main() {
 		mat4 view = myCam.GetViewMatrix();
 		mat4 model = mat4(1.0f);
 
-		diffuseMap.ActiveAndBind(GL_TEXTURE0);
-		specularMap.ActiveAndBind(GL_TEXTURE1);
-		filmMap.ActiveAndBind(GL_TEXTURE2);
+		diffuseMap.activeAndBind(GL_TEXTURE0);
+		specularMap.activeAndBind(GL_TEXTURE1);
+		filmMap.activeAndBind(GL_TEXTURE2);
 
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", myCam.Position);

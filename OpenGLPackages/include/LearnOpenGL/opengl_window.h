@@ -33,6 +33,9 @@ public:
 	GLFWwindow* getWindowPtr()const;
 	bool isWindowClosed() const;
 	~OpenGLWindow();
+	GLFWwindow* operator &() const {
+		return window;
+	}
 };
 
 void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
