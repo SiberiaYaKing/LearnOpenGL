@@ -25,20 +25,25 @@ public:
 		catch (TextureLoadExeception tle) { std::cout << tle.what() <<img_path<< std::endl; }
 	}
 
-	void SetWrapping(GLint param = GL_REPEAT) {
+	void setWrapping(GLint param = GL_REPEAT) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, param);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, param);
 	}
 
-	void SetFiltering(GLint param = GL_LINEAR) {
+	void setFiltering(GLint param = GL_LINEAR) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
 	}
 
-	void SetMipmapFiltering(GLint param = GL_LINEAR_MIPMAP_LINEAR) {
+	void setMipmapFiltering(GLint param = GL_LINEAR_MIPMAP_LINEAR) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
 	}
 
-	void ActiveAndBind(GLenum texcoord) {
+	void bindTexture() {
+		glBindTexture(target, texture);
+	}
+
+	//函数已过时，不推荐使用
+	void activeAndBind(GLenum texcoord) {
 		glActiveTexture(texcoord);
 		glBindTexture(target, texture);
 	}
@@ -47,10 +52,13 @@ public:
 		return  texture;
 	}
 
+	void static activeTexture(GLenum texcoord) {
+		glActiveTexture(texcoord);
+	}
 private:
 	unsigned int texture;
 	GLenum target = GL_TEXTURE_2D;
-
+	
 	void _initTexture_(const std::string &img_path) {
 		glGenTextures(1, &texture);
 		glBindTexture(target, texture);
@@ -68,9 +76,9 @@ private:
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 
-			SetFiltering();
-			SetWrapping();
-			SetMipmapFiltering();
+			setFiltering();
+			setWrapping();
+			setMipmapFiltering();
 		}
 		else throw TextureLoadExeception();
 		stbi_image_free(data);

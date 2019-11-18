@@ -175,9 +175,9 @@ int main() {
 		//glActiveTexture(GL_TEXTURE2);
 		//glBindTexture(GL_TEXTURE_2D, emissionMap);
 		//=============================================
-		diffuseMap.ActiveAndBind(GL_TEXTURE0);
-		specularMap.ActiveAndBind(GL_TEXTURE1);
-		emissiomMap.ActiveAndBind(GL_TEXTURE2);
+		diffuseMap.activeAndBind(GL_TEXTURE0);
+		specularMap.activeAndBind(GL_TEXTURE1);
+		emissiomMap.activeAndBind(GL_TEXTURE2);
 
 
 		lightingShader.use();

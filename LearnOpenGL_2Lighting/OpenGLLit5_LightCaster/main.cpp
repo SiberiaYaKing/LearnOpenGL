@@ -125,10 +125,10 @@ int main() {
 	}
 	window.setCursorDisable();
 	window.setCursorPosCallback([](GLFWwindow* window, double xpos, double ypos) {
-		if (Camera::firstMouse) {
+		if (myCam.firstMouse) {
 			lastX = xpos;
 			lastY = ypos;
-			Camera::firstMouse = false;
+			myCam.firstMouse = false;
 		}
 		float xoffset = xpos - lastX;
 		float yoffset = lastY - ypos;
@@ -186,8 +186,8 @@ int main() {
 		mat4 model = mat4(1.0f);
 		mat3 normalMat = mat3(transpose(inverse(model)));
 
-		diffuseMap.ActiveAndBind(GL_TEXTURE0);
-		specularMap.ActiveAndBind(GL_TEXTURE1);
+		diffuseMap.activeAndBind(GL_TEXTURE0);
+		specularMap.activeAndBind(GL_TEXTURE1);
 
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", myCam.Position);

@@ -72,8 +72,11 @@ public:
 				string name = textures[i].type;
 				if (name == "texture_diffuse")
 					number = std::to_string(diffuseNr++);
-				else if (name == "texture_specular")
-					number = std::to_string(specularNr++); // transfer unsigned int to stream
+				else if (name == "texture_specular"){
+					float shininess = 0.25f;
+					number = std::to_string(specularNr++);
+					shader.setFloat("shininess", shininess*128.0f);
+				}
 				else if (name == "texture_normal")
 					number = std::to_string(normalNr++); // transfer unsigned int to stream
 				else if (name == "texture_height")
@@ -81,12 +84,16 @@ public:
 
 														 // now set the sampler to the correct texture unit
 				//glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-				shader.setInt("material" + name + number, i);
+				shader.setInt(name + number, i);
 				// and finally bind the texture
 				glBindTexture(GL_TEXTURE_2D, textures[i].id);
 			}
 		}
-		else shader.setBool("has_texture", true);
+		else {
+			shader.setBool("has_texture", false);
+			float shininess = 0.25f;
+			shader.setFloat("shininess", shininess*128.0f);
+		}
 	
 
 		// draw mesh
