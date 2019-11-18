@@ -36,7 +36,7 @@
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FrameBuffers_mian.cpp">
+    <ClCompile Include="FrameBuffers_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
