@@ -7,17 +7,12 @@
 
 using namespace std;
 
-
-
-
 float vertices[] = {
 	// 位置              // 颜色
 	 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
 	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
 	 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
 };
-
-
 
 inline int initWindow(GLFWwindow*&);
 void processInput(GLFWwindow*);
@@ -26,11 +21,6 @@ inline void loadShader(unsigned int &);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-
-
-
-
 
 int main() {
 	GLFWwindow* window = NULL;
@@ -127,7 +117,4 @@ void loadVertex(unsigned int& VAO) {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-
 }
-
-

@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_3Blending", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_5FrameBuffers", "AdvanceOpenGL_5FrameBuffers\AdvanceOpenGL_5FrameBuffers.vcxproj", "{DCA790F1-1684-4268-95F4-F86A9858AC21}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_6Cubemaps", "AdvanceOpenGL_6CubeMaps\AdvanceOpenGL_6CubeMaps.vcxproj", "{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{DCA790F1-1684-4268-95F4-F86A9858AC21}.Release|x64.Build.0 = Release|x64
 		{DCA790F1-1684-4268-95F4-F86A9858AC21}.Release|x86.ActiveCfg = Release|Win32
 		{DCA790F1-1684-4268-95F4-F86A9858AC21}.Release|x86.Build.0 = Release|Win32
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Debug|x64.ActiveCfg = Debug|x64
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Debug|x64.Build.0 = Debug|x64
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Debug|x86.ActiveCfg = Debug|Win32
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Debug|x86.Build.0 = Debug|Win32
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x64.ActiveCfg = Release|x64
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x64.Build.0 = Release|x64
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x86.ActiveCfg = Release|Win32
+		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

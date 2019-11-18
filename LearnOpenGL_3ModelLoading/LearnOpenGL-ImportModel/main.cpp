@@ -82,12 +82,12 @@ float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 Camera myCam(vec3(0, 0, 3));
 bool mouse_ctrl;
 
-inline void processInput(OpenGLWindow &);
-inline void setDirLight(Shader shader);
-inline void setPointLight(Shader shader);
-inline void setSpotLight(Shader shader);
-inline void Drawlamp(Shader lampShader, mat4 model, mat4 projection, mat4 view, unsigned lightVAO);
-inline void DrawGUI();
+void processInput(OpenGLWindow &);
+void setDirLight(Shader shader);
+void setPointLight(Shader shader);
+void setSpotLight(Shader shader);
+void Drawlamp(Shader lampShader, mat4 model, mat4 projection, mat4 view, unsigned lightVAO);
+void DrawGUI();
 
 //DirectionLight
 bool isDirLight = true;
@@ -219,7 +219,7 @@ int main() {
 	return 0;
 }
 
-void processInput(OpenGLWindow & w)
+inline void processInput(OpenGLWindow & w)
 {
 	GLFWwindow *pw = w.getWindowPtr();
 	if (glfwGetKey(pw, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -245,7 +245,7 @@ void processInput(OpenGLWindow & w)
 }
 
 
-void setDirLight(Shader shader) {
+inline void setDirLight(Shader shader) {
 	//directionalLight
 	vec3 lightDir(-0.2f, -1.0f, -0.3f);
 	shader.setBool("dirLight.isOn", isDirLight);
@@ -255,7 +255,7 @@ void setDirLight(Shader shader) {
 	shader.setVec3("dirLight.specular", dls.x, dls.y, dls.z);
 }
 
-void setPointLight(Shader shader) {
+inline void setPointLight(Shader shader) {
 	for (int i = 0; i < sizeof(pointLightPositions) / sizeof(pointLightPositions[0]); i++) {
 		string lightName("pointLights");
 		char c = i + '0';
@@ -272,7 +272,7 @@ void setPointLight(Shader shader) {
 	}
 }
 
-void setSpotLight(Shader shader) {
+inline void setSpotLight(Shader shader) {
 	//spotLight
 	float phi = 12.5f, gamma = 17.5f;
 	shader.setBool("spotLight.isOn", isSpotLight);
@@ -288,7 +288,7 @@ void setSpotLight(Shader shader) {
 	shader.setVec3("spotLight.specular", sls.x, sls.y, sls.z);
 }
 
-void Drawlamp(Shader lampShader,mat4 model,mat4 projection,mat4 view,unsigned lightVAO){
+inline void Drawlamp(Shader lampShader,mat4 model,mat4 projection,mat4 view,unsigned lightVAO){
 	for (int i = 0; i < sizeof(pointLightPositions) / sizeof(pointLightPositions[0]) && isPointLight; i++) {
 		model = mat4(1.0f); 
 		model = translate(model, pointLightPositions[i]);
@@ -303,7 +303,7 @@ void Drawlamp(Shader lampShader,mat4 model,mat4 projection,mat4 view,unsigned li
 	}
 }
 
-void DrawGUI(){
+inline void DrawGUI(){
 	ImGui_ImplGlfwGL3_NewFrame();
 	{
 		ImGui::Begin("Tools");

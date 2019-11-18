@@ -52,7 +52,6 @@ struct SpotLight{
 };
 uniform SpotLight spotLight;
 
-#define MAX_TEXTURE_COUNT 4
 
 uniform	sampler2D texture_diffuse1;
 uniform	sampler2D texture_specular1;
