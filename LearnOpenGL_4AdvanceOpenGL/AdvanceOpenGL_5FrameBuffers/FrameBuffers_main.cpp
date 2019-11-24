@@ -193,7 +193,6 @@ int main()
 	while (!window.isWindowClosed())
 	{
 
-
 		// per-frame time logic
 		// --------------------
 		float currentFrame = glfwGetTime();
@@ -205,15 +204,13 @@ int main()
 		processInput(window);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	
-
 		// render
 		// ------
 		framebuffer.switch2Framebuffer();
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		/*Draw others*/{
+		/*Draw Scene*/{
 			shader.use();
 			glm::mat4 model = glm::mat4(1.0f);
 			glm::mat4 view = camera.GetViewMatrix();
