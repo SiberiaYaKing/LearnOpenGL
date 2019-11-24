@@ -14,6 +14,9 @@
 #include <LearnOpenGL/texture_loader.h>
 #include <LearnOpenGL/framebuffer.h>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -21,7 +24,9 @@
 using namespace std;
 
 
-void processInput(GLFWwindow *window);
+void processInput(OpenGLWindow &window);
+void DrawGUI();
+void SetScreenShader(Shader screenShader);
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -35,6 +40,8 @@ float lastY = (float)SCR_HEIGHT / 2.0;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+int screenEffectSelection = 0;
 
 int main()
 {
@@ -71,10 +78,10 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing.fs");
-	//Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer.fs");
-	//Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/inversion.fs");
-	Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/grayscale.fs");
-	//Shader screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/kernel_processing.fs");
+	Shader default_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer.fs");
+	Shader inversion_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/inversion.fs");
+	Shader grayscale_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/grayscale.fs");
+	Shader kernel_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/post-processing/kernel_processing.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -172,15 +179,21 @@ int main()
 	// --------------------
 	shader.use();
 	shader.setInt("texture1", 0);
-	screenShader.use();
-	screenShader.setInt("screenTexture", 0);
+
 
 	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT);
+
+	//init GUI
+	ImGui::CreateContext();
+	ImGui_ImplGlfwGL3_Init(&window, true);
+	ImGui::StyleColorsDark();
 
 	// render loop
 	// -----------
 	while (!window.isWindowClosed())
 	{
+
+
 		// per-frame time logic
 		// --------------------
 		float currentFrame = glfwGetTime();
@@ -189,8 +202,10 @@ int main()
 
 		// input
 		// -----
-		processInput(&window);
+		processInput(window);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	
 
 		// render
 		// ------
@@ -227,13 +242,43 @@ int main()
 		framebuffer.switch2Defaultbuffer();
 		glClearColor(1.0f, 1.0f, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		framebuffer.drawFramebuffer2Defaultbuffer(screenShader);
+		/*screen shader setting*/
+		switch(screenEffectSelection){
+			case 0:
+				default_screenShader.use();
+				default_screenShader.setInt("screenTexture", 0);
+				framebuffer.drawFramebuffer2Defaultbuffer(default_screenShader);
+				break;
+			case 1:
+				inversion_screenShader.use();
+				inversion_screenShader.setInt("screenTexture", 0);
+				framebuffer.drawFramebuffer2Defaultbuffer(inversion_screenShader);
+				break;
+			case 2:
+				grayscale_screenShader.use();
+				grayscale_screenShader.setInt("screenTexture", 0);
+				framebuffer.drawFramebuffer2Defaultbuffer(grayscale_screenShader);
+				break;
+			case 3: case 4: case 5:
+				kernel_screenShader.use();
+				kernel_screenShader.setInt("screenTexture", 0);
+				kernel_screenShader.setInt("selection", screenEffectSelection);
+				framebuffer.drawFramebuffer2Defaultbuffer(kernel_screenShader);
+				break;
+			default: break;
+		}
+		
+
+		DrawGUI();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		window.swapBuffersAndPollEvents();
 	}
 
+	//Close GUI
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwTerminate();
 	return 0;
@@ -241,18 +286,49 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
+inline void processInput(OpenGLWindow &window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		window.closeWindow();
+	if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
 		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetMouseButton(&window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+		if (!camera.mouse_ctrl) {
+			window.setCursorDisable();
+			camera.mouse_ctrl = true;
+		}
+	if (glfwGetMouseButton(&window, GLFW_MOUSE_BUTTON_2) == GLFW_RELEASE)
+		if (camera.mouse_ctrl) {
+			window.setCursorEnable();
+			camera.mouse_ctrl = false;
+		}
 }
+
+//一个简单的后处理效果切换
+inline void DrawGUI() {
+	ImGui_ImplGlfwGL3_NewFrame();
+	{
+		const char* selectionNames[6] = { "Default","GrayScale","Inversion","Sharpen","Blur","EdgeDetection" };
+		ImGui::Begin("Tools");
+		if (ImGui::TreeNode("Screen Effect")) {
+			for (int n = 0; n < sizeof(selectionNames) / sizeof(const char*); n++) {
+				if (ImGui::Selectable(selectionNames[n], screenEffectSelection == n))
+					screenEffectSelection = n;
+			}
+			ImGui::TreePop();
+		}
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+		
+	}
+	ImGui::Render();
+	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 

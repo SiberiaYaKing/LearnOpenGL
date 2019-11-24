@@ -4,6 +4,7 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+uniform int selection;
 
 const float offset = 1.0/300.0;
 
@@ -20,26 +21,35 @@ void main(){
         vec2( offset, -offset)  // сроб
 	);
 
-//	//sharpen
-//	float kernel[9]=float[](
-//        -1, -1, -1,
-//        -1,  9, -1,
-//        -1, -1, -1
-//	);
-	
-//	//blur
-//	float kernel[9]=float[](
-//        1.0/16, 2.0/16, 1.0/16,
-//        2.0/16, 4.0/16, 2.0/16,
-//        1.0/16, 2.0/16, 1.0/16
-//	);
-
-	//edge-detection
 	float kernel[9]=float[](
-        1, 1, 1,
-        1, -8, 1,
-        1, 1, 1
+		1/9, 1/9, 1/9,
+		1/9, 1/9, 1/9,
+		1/9, 1/9, 1/9
 	);
+
+	switch(selection){
+		case 3://sharpen
+			kernel=float[](
+			-1, -1, -1,
+			-1,  9, -1,
+			-1, -1, -1
+			);
+			break;
+		case 4:	//blur
+			kernel=float[](
+			1.0/16, 2.0/16, 1.0/16,
+			2.0/16, 4.0/16, 2.0/16,
+			1.0/16, 2.0/16, 1.0/16
+			);
+			break;
+		case 5: //edge-detection
+			kernel=float[](
+			1, 1, 1,
+			1, -8, 1,
+			1, 1, 1
+			);
+			break;
+	}
 
 	vec3 sampleTex[9];
 	for(int i=0;i<9;i++)  

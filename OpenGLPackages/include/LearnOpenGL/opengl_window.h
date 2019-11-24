@@ -36,6 +36,9 @@ public:
 	GLFWwindow* operator &() const {
 		return window;
 	}
+	void closeWindow() {
+		glfwSetWindowShouldClose(window, true);
+	}
 };
 
 void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
