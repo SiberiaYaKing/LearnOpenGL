@@ -95,6 +95,7 @@ void Mesh::Draw(Shader shader) {
 	unsigned int diffuseNr = 0;
 	unsigned int specularNr = 0;
 	shader.use();
+	//是否有贴图
 	if (textures.size()) {
 		shader.setBool("has_texture", true);
 		for (unsigned int i = 0; i < textures.size(); i++) {
@@ -118,7 +119,6 @@ void Mesh::Draw(Shader shader) {
 		float shininess = 0.25f;
 		shader.setFloat("shininess", shininess*128.0f);
 	}
-
 
 	//绘制网格
 	glBindVertexArray(VAO);

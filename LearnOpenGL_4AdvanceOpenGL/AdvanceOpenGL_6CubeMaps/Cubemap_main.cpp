@@ -236,22 +236,8 @@ int main()
 		mat4 view = camera.GetViewMatrix();
 		mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
-		/*Draw skybox*/ {
-			glDepthMask(GL_FALSE);
-			skyboxShader.use();
-			view = mat4(mat3(camera.GetViewMatrix()));
-			skyboxShader.setMat4("view", view);
-			skyboxShader.setMat4("projection", projection);
-			glBindVertexArray(skyboxVAO);
-			skyboxTexture.bindTexture();
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glBindVertexArray(0);
-			glDepthMask(GL_TRUE);
-		}
-
 		/*Draw cube*/ {
 			cubeShader.use();
-			view = camera.GetViewMatrix();
 			cubeShader.setMat4("model", model);
 			cubeShader.setMat4("view", view);
 			cubeShader.setMat4("projection", projection);
@@ -260,6 +246,21 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 		}
+
+		/*Draw skybox*/ {
+			glDepthFunc(GL_LEQUAL);
+			skyboxShader.use();
+			view = mat4(mat3(camera.GetViewMatrix()));
+			skyboxShader.setMat4("view", view);
+			skyboxShader.setMat4("projection", projection);
+			glBindVertexArray(skyboxVAO);
+			skyboxTexture.bindTexture();
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glBindVertexArray(0);
+			glDepthFunc(GL_LESS);
+		}
+
+
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -275,7 +276,3 @@ int main()
 
 	return 0;
 }
-
-
-
-
