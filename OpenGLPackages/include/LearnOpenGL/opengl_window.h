@@ -6,6 +6,8 @@
 //Òþ²Ø¿ØÖÆÌ¨´°¿Ú
 //#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
+
+
 class InitWindowException :public std::exception {
 public:
 	const char* what()const throw() {
@@ -22,11 +24,12 @@ public:
 
 class OpenGLWindow {
 private:
-	GLFWwindow *window;
+	GLFWwindow *window = nullptr;
+	void(*inputProcessor)(const OpenGLWindow& ) = nullptr;
 public:
 	void initWindow(unsigned int width,unsigned int height,const std::string &name);
-	void setCursorDisable();
-	void setCursorEnable();
+	void setCursorDisable() const;
+	void setCursorEnable() const;
 	void setCursorPosCallback(GLFWcursorposfun cbfun);
 	void setScrollCallback(GLFWscrollfun cbfun);
 	void swapBuffersAndPollEvents();
@@ -39,7 +42,32 @@ public:
 	void closeWindow() {
 		glfwSetWindowShouldClose(window, true);
 	}
+	void setInputProcessor(void(*processor)(const OpenGLWindow&)) {
+		inputProcessor = processor;
+	}
+	void processInput() {
+		if(window && inputProcessor)
+			inputProcessor(*this);
+	}
+	void getWindowSize(int *width,int *height) {
+		if(window) glfwGetWindowSize(window, width, height);
+	}
+public:
+	static float deltaTime;
+	static float calculateDeltaTime() {
+		static float lastFrame = 0.0f;
+		float currentFrame = glfwGetTime();
+		float deltaTime = currentFrame-lastFrame;
+		lastFrame = currentFrame;
+		return deltaTime;
+	}
+	static float lastX; 
+	static float lastY;
 };
+
+float OpenGLWindow::deltaTime = 0.0f;
+float OpenGLWindow::lastX = 0.0f;
+float OpenGLWindow::lastY = 0.0f;
 
 void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
 	glfwInit();
@@ -55,44 +83,49 @@ void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std
 		glfwTerminate();
 		throw InitWindowException();
 	}
-
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
 		glViewport(0, 0, width, height);
 	});
+
 	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw InitGLADException();
 	}
+	lastX = (float)width / 2;
+	lastY = (float)height / 2;
 }
 
 OpenGLWindow::~OpenGLWindow() {
 	glfwTerminate();
 }
 
-void OpenGLWindow::setCursorDisable() {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+void OpenGLWindow::setCursorDisable() const{
+	if(window) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void OpenGLWindow::setCursorEnable() {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+void OpenGLWindow::setCursorEnable() const {
+	if (window) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void OpenGLWindow::setCursorPosCallback(GLFWcursorposfun cbfun)  {
-	glfwSetCursorPosCallback(window, cbfun);
+	if (window) glfwSetCursorPosCallback(window, cbfun);
 }
 
 void OpenGLWindow::setScrollCallback(GLFWscrollfun cbfun)  {
-	glfwSetScrollCallback(window, cbfun);
+	if (window) glfwSetScrollCallback(window, cbfun);
 }
 
 bool OpenGLWindow::isWindowClosed() const {
-	return glfwWindowShouldClose(window);
+	if (window) return glfwWindowShouldClose(window);
+	else false;
 }
 
 void OpenGLWindow::swapBuffersAndPollEvents()  {
-	glfwSwapBuffers(window);
-	glfwPollEvents();
+	if (window) {
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 }
 
 GLFWwindow* OpenGLWindow::getWindowPtr()const {
