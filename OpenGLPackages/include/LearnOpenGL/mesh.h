@@ -104,25 +104,23 @@ void Mesh::Draw(Shader shader) {
 			std::string name = textures[i].type;
 			if (name == "texture_diffuse")
 				number = std::to_string(diffuseNr++);
-			else if (name == "texture_specular") {
-				float shininess = 0.25f;
+			else if (name == "texture_specular") 
 				number = std::to_string(specularNr++);
-				shader.setFloat("shininess", shininess*128.0f);
-			}
 			shader.setInt( name + number, i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
 		glActiveTexture(GL_TEXTURE0);   //设置纹理单元为默认值
 	}
-	else {
-		shader.setBool("has_texture", false);
-		float shininess = 0.25f;
-		shader.setFloat("shininess", shininess*128.0f);
-	}
+	else  shader.setBool("has_texture", false);
+
+	float shininess = 0.25f;
+	shader.setFloat("shininess", shininess*128.0f);
 
 	//绘制网格
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0); //解绑
+
+	glActiveTexture(0);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

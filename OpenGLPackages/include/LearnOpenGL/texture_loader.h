@@ -93,7 +93,7 @@ public:
 	}
 private:
 	unsigned int texture;
-	GLenum target = GL_TEXTURE_2D;
+	GLenum target;
 	
 	void _initTexture_(const std::string &img_path) {
 		glGenTextures(1, &texture);

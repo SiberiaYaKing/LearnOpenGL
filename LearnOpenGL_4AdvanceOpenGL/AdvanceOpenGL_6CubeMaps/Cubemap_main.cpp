@@ -17,6 +17,9 @@
 #include <vector>
 #include <string>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
+
 using namespace std;
 using namespace glm;
 
@@ -25,6 +28,10 @@ const unsigned int SCR_HEIGHT = 720;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+int selection = 0;
+
+void DrawGUI();
 
 int main()
 {
@@ -77,52 +84,53 @@ int main()
 	// configure global opengl state
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
-
+	glEnable(GL_CULL_FACE);
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 	float cubeVertices[] = {
-		// positions          // texture Coords
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		// positions          // normals           // texture coords
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f
 	};
 	float skyboxVertices[] = {
 		// positions          
@@ -177,9 +185,11 @@ int main()
 		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		glBindVertexArray(0);
 	}
 
@@ -201,18 +211,27 @@ int main()
 	for (int i = 0; i < face_paths.size(); i++) 
 		face_paths[i] = dir_textures + "skybox/" + face_paths[i];
 	TextureLoader skyboxTexture(face_paths);
-	TextureLoader cubeTexture(dir_textures + "container.jpg");
 
 	//load cubeShader 
 	//---------------
 	Shader skyboxShader(dir_shaders + "AdvanceOpenGL/skyboxShader.vs", dir_shaders + "AdvanceOpenGL/skyboxShader.fs");
-	Shader cubeShader(dir_shaders + "AdvanceOpenGL/depth_testing.vs", dir_shaders + "AdvanceOpenGL/depth_testing.fs");
+	Shader cubemapShader(dir_shaders + "AdvanceOpenGL/cubemap/reflection&refraction.vs", dir_shaders + "AdvanceOpenGL/cubemap/reflection&refraction.fs");
 
-	//cubeShader settting
-	cubeShader.use();
-	cubeShader.setInt("texture1", 0);
+
+	//Shader settting
 	skyboxShader.use();
 	skyboxShader.setInt("skybox", 0);
+	cubemapShader.use();
+	cubemapShader.setInt("skybox", 0);
+
+	//nanosuit model
+	Model nanosuit(dir_models + "nanosuit/nanosuit.obj");
+
+	//init gui
+	ImGui::CreateContext();
+	ImGui_ImplGlfwGL3_Init(&window, true);
+	ImGui::StyleColorsDark();
+
 
 	// render loop
 	// -----------
@@ -237,14 +256,24 @@ int main()
 		mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 		/*Draw cube*/ {
-			cubeShader.use();
-			cubeShader.setMat4("model", model);
-			cubeShader.setMat4("view", view);
-			cubeShader.setMat4("projection", projection);
+			cubemapShader.use();
+			cubemapShader.setMat4("model", model);
+			cubemapShader.setMat4("view", view);
+			cubemapShader.setMat4("projection", projection);
+			cubemapShader.setVec3("cameraPos", camera.Position);
+			cubemapShader.setInt("selection", selection);
 			glBindVertexArray(cubeVAO);
-			cubeTexture.bindTexture();
+			skyboxTexture.bindTexture();
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
+		}
+		
+		/*Draw nanosuit*/{
+			model = translate(model, glm::vec3(1.5f, -1.75f,0));
+			model = scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+			cubemapShader.setMat4("model", model);
+			cubemapShader.setInt("selection", selection);
+			nanosuit.Draw(cubemapShader);
 		}
 
 		/*Draw skybox*/ {
@@ -260,7 +289,7 @@ int main()
 			glDepthFunc(GL_LESS);
 		}
 
-
+		DrawGUI();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -275,4 +304,22 @@ int main()
 	glDeleteBuffers(1, &skyboxVAO);
 
 	return 0;
+}
+
+inline void DrawGUI() {
+	ImGui_ImplGlfwGL3_NewFrame();
+	{
+		const char* selectionNames[2] = {"Reflection","Refraction" };
+		ImGui::Begin("Tools");
+		if (ImGui::TreeNode("Selection")) {
+			for (int n = 0; n < sizeof(selectionNames) / sizeof(const char*); n++)
+				if (ImGui::Selectable(selectionNames[n], selection == n))
+					selection = n;
+			ImGui::TreePop();
+		}
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+	ImGui::Render();
+	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 }
