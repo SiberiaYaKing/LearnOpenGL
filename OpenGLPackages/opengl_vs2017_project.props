@@ -6,12 +6,20 @@
     <IncludePath>..\..\OpenGLPackages\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\OpenGLPackages\libs;$(LibraryPath)</LibraryPath>
     <_PropertySheetDisplayName>opengl_vs2017_project</_PropertySheetDisplayName>
+    <OutDir>$(SolutionDir)$(Platform)_$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
       <AdditionalDependencies>opengl32.lib;assimp-vc141-mtd-boost-dx64.lib;assimp-vc141-mtd-boost-dx86.lib;glfw3_dx64.lib;glfw3_dx86.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreLinkEvent>
+      <Command>copy $(SolutionDir)..\OpenGLPackages\dlls\dlls_$(Platform)\*.dll $(SolutionDir)$(Platform)_$(Configuration)\</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

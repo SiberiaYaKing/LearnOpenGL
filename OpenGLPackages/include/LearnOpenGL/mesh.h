@@ -12,6 +12,8 @@ struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;
+	glm::vec3 Tangent = glm::vec3(0);
+	glm::vec3 Bitangent = glm::vec3(0);
 };
 
 struct Texture {
@@ -121,6 +123,6 @@ void Mesh::Draw(Shader shader) {
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0); //½â°ó
 
-	glActiveTexture(0);
+	//glActiveTexture(0);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

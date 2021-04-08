@@ -92,8 +92,8 @@ void DrawGUI();
 //DirectionLight
 bool isDirLight = true;
 vec4 dla(0.05f, 0.05f, 0.05f, 1);
-vec4 dld(0.4f, 0.4f, 0.4f, 1);
-vec4 dls(0.5f, 0.5f, 0.5f, 1);
+vec4 dld(0.7f, 0.7f, 0.7f, 1);
+vec4 dls(0.9f, 0.9f, 0.9f, 1);
 
 //PointLight
 bool isPointLight = true;
@@ -182,25 +182,35 @@ int main() {
 
 		mat4 projection = perspective(radians(myCam.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		mat4 view = myCam.GetViewMatrix();
-		mat4 model = mat4(1.0);
-		model = translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-		model = scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+
 
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", myCam.Position);
 		//matrix
 		lightingShader.setMat4("projection", projection);
 		lightingShader.setMat4("view", view);
-		lightingShader.setMat4("model", model);
 
 		//lightSetting
 		setDirLight(lightingShader);
 		setSpotLight(lightingShader);
 		setPointLight(lightingShader);
+
+		mat4 model = mat4(1.0);
+		
+		model = scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		model = translate(model, glm::vec3(-1.0f, -1.75f, 0.0f));
+		lightingShader.setMat4("model", model);
+		basketball.Draw(lightingShader);
+		
+		model = mat4(1.0);
+		model = translate(model, glm::vec3(-1,-2,-1));
+		model = scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		lightingShader.setMat4("model", model);
+
 		Drawlamp(lampShader, model, projection, view, lightVAO);
 
 		nanosuit.Draw(lightingShader);
-		basketball.Draw(lightingShader);
+		
 
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		DrawGUI();
