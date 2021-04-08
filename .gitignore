@@ -18,6 +18,10 @@
 [Rr]elease/
 [Rr]eleases/
 x64/
+x64_[Dd]ebug/
+Win32_[Dd]bug/
+x64_[Rr]elease/
+Win32_[Rr]elease/
 x86/
 bld/
 [Bb]in/
