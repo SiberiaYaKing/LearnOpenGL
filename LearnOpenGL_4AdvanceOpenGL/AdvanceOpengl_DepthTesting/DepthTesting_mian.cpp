@@ -64,7 +64,7 @@ int main()
 	//glDepthFunc(GL_LESS);  //less is defalut value;
 	// build and compile shaders
 	// -------------------------
-	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing.fs");
+	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing/depth_testing.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------

@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -217,7 +219,7 @@ int main()
 
 	//load cubeShader 
 	//---------------
-	Shader skyboxShader(dir_shaders + "AdvanceOpenGL/skyboxShader.vs", dir_shaders + "AdvanceOpenGL/skyboxShader.fs");
+	Shader skyboxShader(dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.vs", dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.fs");
 	Shader cubemapShader(dir_shaders + "AdvanceOpenGL/cubemap/reflection&refraction.vs", dir_shaders + "AdvanceOpenGL/cubemap/reflection&refraction.fs");
 
 

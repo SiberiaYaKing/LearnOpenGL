@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.438
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_1DepthTesting", "AdvanceOpengl_DepthTesting\AdvanceOpengl_DepthTesting.vcxproj", "{FB4CA96D-A067-4F25-AA8D-DD3E8A702013}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_5FrameBuffers", "AdvanceOpenGL_5FrameBuffers\AdvanceOpenGL_5FrameBuffers.vcxproj", "{DCA790F1-1684-4268-95F4-F86A9858AC21}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_6Cubemaps", "AdvanceOpenGL_6CubeMaps\AdvanceOpenGL_6CubeMaps.vcxproj", "{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_7AdvanceDataAndGLSL", "AdvanceOpenGL_7AdvanceDataAndGLSL\AdvanceOpenGL_7AdvanceDataAndGLSL.vcxproj", "{57A738CA-449B-4F26-8ADD-72C12F4862EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,14 @@ Global
 		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x64.Build.0 = Release|x64
 		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x86.ActiveCfg = Release|Win32
 		{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}.Release|x86.Build.0 = Release|Win32
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Debug|x64.ActiveCfg = Debug|x64
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Debug|x64.Build.0 = Debug|x64
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Debug|x86.ActiveCfg = Debug|Win32
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Debug|x86.Build.0 = Debug|Win32
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x64.ActiveCfg = Release|x64
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x64.Build.0 = Release|x64
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x86.ActiveCfg = Release|Win32
+		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

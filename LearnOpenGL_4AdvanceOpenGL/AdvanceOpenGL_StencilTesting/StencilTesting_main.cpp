@@ -82,8 +82,8 @@ int main()
 
 	// build and compile shaders
 	// -------------------------
-	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing.fs");
-	Shader shaderSingleColor(dir_shaders + "AdvanceOpenGL/depth_testing.vs", dir_shaders + "AdvanceOpenGL/stencil_testing.fs");
+	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing/depth_testing.fs");
+	Shader shaderSingleColor(dir_shaders + "AdvanceOpenGL/depth_testing/depth_testing.vs", dir_shaders + "AdvanceOpenGL/stencil_testing/stencil_testing.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------

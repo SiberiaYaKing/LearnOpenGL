@@ -15,8 +15,10 @@
 #include <iostream>
 #include <map>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 
-void processInput(GLFWwindow *window);
+void processInput(const OpenGLWindow &window);
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -31,6 +33,10 @@ float lastY = (float)SCR_HEIGHT / 2.0;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+int selection = 0;
+
+void DrawGUI();
+
 int main()
 {
 	OpenGLWindow window;
@@ -41,7 +47,6 @@ int main()
 		std::cout << e.what() << std::endl;
 		return -1;
 	}
-	window.setCursorDisable();
 	window.setCursorPosCallback([](GLFWwindow* window, double xpos, double ypos) {
 		if (camera.firstMouse) {
 			lastX = xpos;
@@ -56,6 +61,7 @@ int main()
 	window.setScrollCallback([](GLFWwindow* window, double xoffset, double yoffset) {
 		camera.ProcessMouseScroll(yoffset);
 	});
+	window.setInputProcessor(processInput);
 	
 
 	// configure global opengl state
@@ -68,7 +74,7 @@ int main()
 
 	// build and compile shaders
 	// -------------------------
-	Shader shader(dir_shaders + "AdvanceOpenGL/depth_testing.vs", dir_shaders + "AdvanceOpenGL/blending.fs");
+	Shader shader(dir_shaders + "AdvanceOpenGL/depth_testing/depth_testing.vs", dir_shaders + "AdvanceOpenGL/blending/blending.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -195,6 +201,12 @@ int main()
 	shader.use();
 	shader.setInt("texture1", 0);
 
+	//init gui
+	ImGui::CreateContext();
+	ImGui_ImplGlfwGL3_Init(&window, true);
+	ImGui::StyleColorsDark();
+
+
 	// render loop
 	// -----------
 	while (!window.isWindowClosed())
@@ -207,7 +219,7 @@ int main()
 
 		// input
 		// -----
-		processInput(&window);
+		window.processInput();
 
 		// render
 		// ------
@@ -242,7 +254,7 @@ int main()
 			glBindVertexArray(0);
 		}
 	
-		/*grass*/ {
+		if (selection == 0) /*grass*/ {
 			glBindVertexArray(transparentVAO);
 			grassTexture.bindTexture();
 			for (unsigned int i = 0; i < sizeof(transparent_pos) / sizeof(glm::vec3); i++) {
@@ -253,23 +265,24 @@ int main()
 			}
 			glBindVertexArray(0);
 		}
+		else if (selection == 1) /*glass*/ {
+			std::map<float, glm::vec3> sorted;
+			for (unsigned int i = 0; i < sizeof(transparent_pos) / sizeof(glm::vec3); i++) {
+				float distance = glm::length(camera.Position - transparent_pos[i]);
+				sorted[distance] = transparent_pos[i];
+			}
+			glBindVertexArray(transparentVAO);
+			glassTexture.bindTexture();
+			for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) {
+				model = glm::mat4(1.0f);
+				model = glm::translate(model, it->second);
+				shader.setMat4("model", model);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+			glBindVertexArray(0);
+		}
 
-		///*glass*/ {
-		//	std::map<float, glm::vec3> sorted;
-		//	for (unsigned int i = 0; i < sizeof(transparent_pos) / sizeof(glm::vec3); i++) {
-		//		float distance = glm::length(camera.Position - transparent_pos[i]);
-		//		sorted[distance] = transparent_pos[i];
-		//	}
-		//	glBindVertexArray(transparentVAO);
-		//	glassTexture.bindTexture();
-		//	for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) {
-		//		model = glm::mat4(1.0f);
-		//		model = glm::translate(model, it->second);
-		//		shader.setMat4("model", model);
-		//		glDrawArrays(GL_TRIANGLES, 0, 6);
-		//	}
-		//	glBindVertexArray(0);
-		//}
+		DrawGUI();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -285,24 +298,56 @@ int main()
 	glDeleteBuffers(1, &planeVBO);
 	glDeleteBuffers(1, &transparentVBO);
 
+	//Close GUI
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
+
 	glfwTerminate();
 	return 0;
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-inline void processInput(GLFWwindow *window)
+inline void processInput(const OpenGLWindow &window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(&window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_S) == GLFW_PRESS)
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_A) == GLFW_PRESS)
 		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(&window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+
+	if (glfwGetMouseButton(&window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+		if (!camera.mouse_ctrl) {
+			window.setCursorDisable();
+			camera.mouse_ctrl = true;
+		}
+	if (glfwGetMouseButton(&window, GLFW_MOUSE_BUTTON_2) == GLFW_RELEASE)
+		if (camera.mouse_ctrl) {
+			window.setCursorEnable();
+			camera.mouse_ctrl = false;
+		}
 }
 
+inline void DrawGUI() {
+	ImGui_ImplGlfwGL3_NewFrame();
+	{
+		const char* selectionNames[2] = { "Draw Grass","Draw Glass" };
+		ImGui::Begin("Tools");
+		if (ImGui::TreeNode("Selection")) {
+			for (int n = 0; n < sizeof(selectionNames) / sizeof(const char*); n++)
+				if (ImGui::Selectable(selectionNames[n], selection == n))
+					selection = n;
+			ImGui::TreePop();
+		}
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+	ImGui::Render();
+	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+}
