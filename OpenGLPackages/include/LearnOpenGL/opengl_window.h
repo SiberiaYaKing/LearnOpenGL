@@ -59,6 +59,7 @@ public:
 		float currentFrame = glfwGetTime();
 		float deltaTime = currentFrame-lastFrame;
 		lastFrame = currentFrame;
+		OpenGLWindow::deltaTime = deltaTime;
 		return deltaTime;
 	}
 	static float lastX; 

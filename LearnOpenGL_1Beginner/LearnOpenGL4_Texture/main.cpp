@@ -5,11 +5,14 @@
 
 #include <LearnOpenGL/shader.h>
 #include <LearnOpenGL/assets_directory.h>
+#include <LearnOpenGL/geometry_data.h>
+#include <LearnOpenGL/mesh.h>
 
 #include <iostream>
 #include <math.h>
 
 #include <stb_image.h>
+
 
 using namespace std;
 
@@ -58,7 +61,9 @@ int main() {
 	Shader ourShader("shader.vs", "shader.fs");
 
 	unsigned int VAO,texture1,texture2;
-	loadVertex(VAO);
+	//loadVertex(VAO);
+	QuadData quadData;
+	Mesh quad(quadData.vertices, quadData.indices, quadData.textures);
 	loadTexture(texture1,(dir_textures+"container.jpg").c_str(),"jpg");
 	loadTexture(texture2,(dir_textures+"awesomeface.png").c_str(),"png");
 
@@ -121,6 +126,7 @@ int main() {
 	//stbi_image_free(data);
 
 
+
 	//渲染循环
 	while (!glfwWindowShouldClose(window)) {
 		//清空颜色缓冲
@@ -142,9 +148,10 @@ int main() {
 		ourShader.setInt("texture2", 1);  //或使用着色器类设置
 		ourShader.setFloat("mixValue", mixValue);
 
-		ourShader.use();
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);   ////画矩形
+		quad.Draw(ourShader);
+		//ourShader.use();
+		//glBindVertexArray(VAO);
+		//glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);   ////画矩形
 
 		//检查并调用事件，交换缓冲
 		glfwSwapBuffers(window);

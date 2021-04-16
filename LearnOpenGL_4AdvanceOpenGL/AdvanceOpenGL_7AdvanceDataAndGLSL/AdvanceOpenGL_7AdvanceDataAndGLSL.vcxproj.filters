@@ -33,5 +33,11 @@
     <ClCompile Include="..\..\OpenGLPackages\src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AdvanceDataAndGLSL_main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -46,3 +46,20 @@ struct CubeData {
 	std::vector<Texture> textures;
 };
 
+
+struct QuadData {
+	std::vector<Vertex> vertices{
+		//     ---- 位置 ----       ---- 法线 ----			- 纹理坐标 -
+		{{ 0.5f,  0.5f, 0.0f,},  { 0.0f, 0.0f, 1.0f,},   {1.0f, 1.0f,}},   // 右上
+		{{ 0.5f, -0.5f, 0.0f,},  { 0.0f, 0.0f, 1.0f,},   {1.0f, 0.0f,}},   // 右下
+		{{-0.5f, -0.5f, 0.0f,},  { 0.0f, 0.0f, 1.0f,},   {0.0f, 0.0f,}},   // 左下
+		{{-0.5f,  0.5f, 0.0f,},  { 0.0f, 0.0f, 1.0f,},   {0.0f, 1.0f }},   // 左上
+	};
+
+	std::vector<unsigned int> indices{ // 注意索引从0开始! 
+		0, 1, 3, // 第一个三角形
+		1, 2, 3  // 第二个三角形
+	};
+
+	std::vector<Texture> textures;
+};

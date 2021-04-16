@@ -52,6 +52,7 @@ public:
 		}
 	};
 	void Draw(Shader shader);
+	void drawPoint(Shader shader);
 private:
 	//渲染数据
 	unsigned int VAO, VBO, EBO;
@@ -124,5 +125,12 @@ void Mesh::Draw(Shader shader) {
 	glBindVertexArray(0); //解绑
 
 	//glActiveTexture(0);
+}
+
+void Mesh::drawPoint(Shader shader) {
+	shader.use();
+	glBindVertexArray(VAO);
+	glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0); //解绑
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

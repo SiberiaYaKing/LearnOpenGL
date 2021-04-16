@@ -1,4 +1,3 @@
-#define STB_IMAGE_IMPLEMENTATION
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -15,13 +14,14 @@
 #include <LearnOpenGL/opengl_window.h>
 #include <LearnOpenGL/texture_loader.h>
 #include <LearnOpenGL/geometry_data.h>
+#include <LearnOpenGL/imgui_helper.h>
 
 #include <iostream>
 #include <vector>
 #include <string>
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw_gl3.h>
+//#include <imgui/imgui.h>
+//#include <imgui/imgui_impl_glfw_gl3.h>
 
 using namespace std;
 using namespace glm;
@@ -236,10 +236,10 @@ int main()
 	Mesh skyboxMesh(cubeData.vertices, cubeData.indices, cubeData.textures);
 
 	//init gui
-	ImGui::CreateContext();
+	/*ImGui::CreateContext();
 	ImGui_ImplGlfwGL3_Init(&window, true);
-	ImGui::StyleColorsDark();
-
+	ImGui::StyleColorsDark();*/
+	ImGuiHelper::initImGui(&window);
 
 	// render loop
 	// -----------
@@ -309,7 +309,8 @@ int main()
 			glEnable(GL_CULL_FACE);
 		}
 
-		DrawGUI();
+		//DrawGUI();
+		ImGuiHelper::drawImGui(DrawGUI);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -323,23 +324,43 @@ int main()
 	//glDeleteBuffers(1, &cubeVBO);
 	//glDeleteBuffers(1, &skyboxVAO);
 #pragma endregion
+
+	//Close GUI
+	/*ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();*/
+	ImGuiHelper::destroyImGui();
+
+
 	return 0;
 }
 
-inline void DrawGUI() {
-	ImGui_ImplGlfwGL3_NewFrame();
-	{
-		const char* selectionNames[2] = {"Reflection","Refraction" };
-		ImGui::Begin("Tools");
-		if (ImGui::TreeNode("Selection")) {
-			for (int n = 0; n < sizeof(selectionNames) / sizeof(const char*); n++)
-				if (ImGui::Selectable(selectionNames[n], selection == n))
-					selection = n;
-			ImGui::TreePop();
-		}
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+//inline void DrawGUI() {
+//	ImGui_ImplGlfwGL3_NewFrame();
+//	{
+//		static const char* selectionNames[2] = {"Reflection","Refraction" };
+//		ImGui::Begin("Tools");
+//		if (ImGui::TreeNode("Selection")) {
+//			for (int n = 0; n < sizeof(selectionNames) / sizeof(const char*); n++)
+//				if (ImGui::Selectable(selectionNames[n], selection == n))
+//					selection = n;
+//			ImGui::TreePop();
+//		}
+//		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+//		ImGui::End();
+//	}
+//	ImGui::Render();
+//	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+//}
+
+void DrawGUI() {
+	static const char* selectionNames[2] = {"Reflection","Refraction" };
+	ImGui::Begin("Tools");
+	if (ImGui::TreeNode("Selection")) {
+		for (int n = 0; n < sizeof(selectionNames) / sizeof(const char*); n++)
+			if (ImGui::Selectable(selectionNames[n], selection == n))
+				selection = n;
+		ImGui::TreePop();
 	}
-	ImGui::Render();
-	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
 }
