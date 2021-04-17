@@ -1,10 +1,11 @@
-#include "pch.h"
 
+#include "pch.h"
 using namespace std;
 using namespace glm;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 560;
+const string shaderDir = dir_shaders + ("PartFor2DRendering/TextRendering/");
 
 int main() {
 	OpenGLWindow window; {
@@ -13,23 +14,31 @@ int main() {
 			cout << e.what() << endl;
 			return -1;
 		}
+		window.setInputProcessor([](const OpenGLWindow& window) {
+			if (glfwGetKey(&window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+				{window.closeWindow();}
+		});
 	}
 
-	FT_Library ft;
-	if (FT_Init_FreeType(&ft)) {
-		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-	}
+	Shader textShader(shaderDir + "textShader.vs", shaderDir+ "textShader.fs");
+	mat4 projection = ortho(0.0, (double)SCR_WIDTH, 0.0, (double)SCR_HEIGHT);
+	textShader.use();
+	textShader.setMat4("projection", projection);
+	Text text(dir_fonts + "arial.ttf");
 
-	FT_Face face;
-	if (FT_New_Face(ft, (dir_fonts+"Arial.ttf").c_str(), 0, &face)) {
-		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-	}
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	while (!window.isWindowClosed()) {
 		OpenGLWindow::calculateDeltaTime();
-		OpenGLWindow::openglClearDefaultFrameBuffer( 0.0, 0.0, 0.5, 1.0);
+		glClearColor(0.0, 0.0, 0.5, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT);
 		window.processInput();
 
+		text.drawText(textShader, L"This is sample text", glm::vec4(0.5, 0.8f, 0.2f, 1.0), { 25.0f, 25.0f }, 1.0f);
+		text.drawText(textShader, L"(C) LearnOpenGL.com", glm::vec4(0.3, 0.7f, 0.9f,1.0f), { 500.0f, 540.0f }, 0.5f);
+		
 
 		window.swapBuffersAndPollEvents();
 	}

@@ -3,8 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <exception>
-//Òþ²Ø¿ØÖÆÌ¨´°¿Ú
-//#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
 class OpenGLWindowException :public std::exception {
 public:
@@ -42,17 +40,17 @@ public:
 	GLFWwindow* operator &() const {
 		return window;
 	}
-	void closeWindow() {
+	void closeWindow() const {
 		glfwSetWindowShouldClose(window, true);
 	}
 	void setInputProcessor(void(*processor)(const OpenGLWindow&)) {
 		inputProcessor = processor;
 	}
-	void processInput() {
+	void processInput() const{
 		if(window && inputProcessor)
 			inputProcessor(*this);
 	}
-	void getWindowSize(int *width,int *height) {
+	void getWindowSize(int *width,int *height) const {
 		if(window) glfwGetWindowSize(window, width, height);
 	}
 public:
@@ -65,10 +63,10 @@ public:
 		OpenGLWindow::deltaTime = deltaTime;
 		return deltaTime;
 	}
-	static void openglClearDefaultFrameBuffer(GLfloat r,GLfloat g,GLfloat b,GLfloat a) {
-		glClearColor(r,g,b,a);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+	//static void openglClearDefaultFrameBuffer(GLfloat r,GLfloat g,GLfloat b,GLfloat a) {
+	//	glClearColor(r,g,b,a);
+	//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//}
 	static float lastX; 
 	static float lastY;
 };

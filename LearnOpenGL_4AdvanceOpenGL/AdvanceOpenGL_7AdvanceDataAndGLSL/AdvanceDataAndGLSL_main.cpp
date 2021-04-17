@@ -135,9 +135,6 @@ int main() {
 		window.swapBuffersAndPollEvents();
 	}
 
-	//Close GUI
-	ImGuiHelper::destroyImGui();
-
 	return 0;
 }
 

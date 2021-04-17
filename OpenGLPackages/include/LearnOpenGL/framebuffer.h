@@ -76,7 +76,7 @@ public:
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	//不太清楚封装的意义，慎用
+	//清空帧缓冲
 	void clearColor(float r=1,float g=1,float b=1,float a=1) {
 		glClearColor(r,g,b,a);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -89,6 +89,7 @@ public:
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
+private:
 	class VGC {
 		unsigned int VAO, VBO;
 	public:

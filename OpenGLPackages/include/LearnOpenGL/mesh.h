@@ -33,7 +33,15 @@ public:
 
 	Mesh(std::vector<Vertex>, std::vector<unsigned int>, std::vector<Texture>);
 
+	void Draw(Shader shader);
+	void drawPoint(Shader shader);
+private:
+	//渲染数据
+	unsigned int VAO, VBO, EBO;
 
+	void setupMesh();
+
+private:
 	class MeshGC {
 	private:
 		std::vector<unsigned int> VAOs, VBOs, EBOs;
@@ -51,13 +59,7 @@ public:
 			}
 		}
 	};
-	void Draw(Shader shader);
-	void drawPoint(Shader shader);
-private:
-	//渲染数据
-	unsigned int VAO, VBO, EBO;
 
-	void setupMesh();
 };
 
 //------------------------------------------------------------------
