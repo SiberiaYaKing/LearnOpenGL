@@ -88,7 +88,7 @@ Text::Text(const std::string& fontFilePath) {
 bool Text::loadCharacter(wchar_t character) {
 	if (charMap.find(character) == charMap.end()) {
 		// ¼ÓÔØ×Ö·ûµÄ×ÖÐÎ 
-		if (FT_Load_Char(face, (GLubyte)character, FT_LOAD_RENDER)) {
+		if (FT_Load_Char(face, character, FT_LOAD_RENDER)) {
 			std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
 			return false;
 		}

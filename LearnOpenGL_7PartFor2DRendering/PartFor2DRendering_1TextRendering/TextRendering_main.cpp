@@ -24,7 +24,7 @@ int main() {
 	mat4 projection = ortho(0.0, (double)SCR_WIDTH, 0.0, (double)SCR_HEIGHT);
 	textShader.use();
 	textShader.setMat4("projection", projection);
-	Text text(dir_fonts + "arial.ttf");
+	Text text(dir_fonts + "msyh.ttc");
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
@@ -36,8 +36,8 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		window.processInput();
 
-		text.drawText(textShader, L"This is sample text", glm::vec4(0.5, 0.8f, 0.2f, 1.0), { 25.0f, 25.0f }, 1.0f);
-		text.drawText(textShader, L"(C) LearnOpenGL.com", glm::vec4(0.3, 0.7f, 0.9f,1.0f), { 500.0f, 540.0f }, 0.5f);
+		text.drawText(textShader, L"Bad apple!!!", glm::vec4(0.5, 0.8f, 0.2f, 1.0), { 25.0f, 25.0f }, 1.0f);
+		text.drawText(textShader, L"此生无悔入东方", glm::vec4(0.3, 0.7f, 0.9f,1.0f), { 500.0f, 530.0f }, 0.5f);
 		
 
 		window.swapBuffersAndPollEvents();
