@@ -149,6 +149,3 @@ public:
 	}
 };
 #endif
-
-//当firstMouse是static的时候
-//bool Camera::firstMouse = true;

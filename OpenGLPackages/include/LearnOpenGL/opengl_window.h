@@ -6,19 +6,22 @@
 //Òþ²Ø¿ØÖÆÌ¨´°¿Ú
 //#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
+class OpenGLWindowException :public std::exception {
+public:
+	virtual const char* what()const throw() { return "OpenGLWindow Exception!!"; }
+};
 
-
-class InitWindowException :public std::exception {
+class InitWindowException :public OpenGLWindowException {
 public:
 	const char* what()const throw() {
-		return "Failed to create GLFW window\n";
+		return "OpenGLWindow Exception!! Failed to create GLFW window\n";
 	}
 };
 
-class InitGLADException :public std::exception {
+class InitGLADException :public OpenGLWindowException {
 public:
 	const char* what()const throw() {
-		return "Failed to initialize GLAD\n";
+		return "OpenGLWindow Exception!! Failed to initialize GLAD\n";
 	}
 };
 
@@ -61,6 +64,10 @@ public:
 		lastFrame = currentFrame;
 		OpenGLWindow::deltaTime = deltaTime;
 		return deltaTime;
+	}
+	static void openglClearDefaultFrameBuffer(GLfloat r,GLfloat g,GLfloat b,GLfloat a) {
+		glClearColor(r,g,b,a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	static float lastX; 
 	static float lastY;

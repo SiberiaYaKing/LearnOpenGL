@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>opengl32.lib;assimp-vc141-mtd-boost-dx64.lib;assimp-vc141-mtd-boost-dx86.lib;glfw3_dx64.lib;glfw3_dx86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;assimp-vc141-mtd-boost-dx64.lib;assimp-vc141-mtd-boost-dx86.lib;glfw3_dx64.lib;glfw3_dx86.lib;freetype_dx64.lib;freetype_dx86.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
@@ -18,7 +18,8 @@
       </Command>
     </PreBuildEvent>
     <PreLinkEvent>
-      <Command>copy $(SolutionDir)..\OpenGLPackages\dlls\dlls_$(Platform)\*.dll $(SolutionDir)$(Platform)_$(Configuration)\</Command>
+      <Command>copy $(SolutionDir)..\OpenGLPackages\dlls\dlls_$(Platform)\*.lib $(SolutionDir)$(Platform)_$(Configuration)\
+copy $(SolutionDir)..\OpenGLPackages\dlls\dlls_$(Platform)\*.dll $(SolutionDir)$(Platform)_$(Configuration)\</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup />

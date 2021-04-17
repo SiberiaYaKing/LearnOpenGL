@@ -37,7 +37,7 @@ void drawGUI();
 int main() {
 	OpenGLWindow window; {
 		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceOpenGL_AdvanceDataAndGLSL"); }
-		catch(InitWindowException e) {
+		catch(OpenGLWindowException e) {
 			cout << e.what() << endl;
 			return -1;
 		}

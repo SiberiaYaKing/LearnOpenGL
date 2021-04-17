@@ -7,3 +7,4 @@
 const std::string dir_textures("..\\..\\Resources\\textures\\");
 const std::string dir_models("../../Resources/models/");
 const std::string dir_shaders("../../Resources/shaders/");
+const std::string dir_fonts("../../Resources/fonts/");
