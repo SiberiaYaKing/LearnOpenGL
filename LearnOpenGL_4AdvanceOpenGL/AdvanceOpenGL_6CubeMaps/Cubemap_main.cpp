@@ -301,7 +301,7 @@ int main()
 			glDepthFunc(GL_LEQUAL);
 			glDisable(GL_CULL_FACE);
 			skyboxShader.use();
-			view = mat4(mat3(camera.GetViewMatrix()));
+			view = mat4(mat3(camera.GetViewMatrix())); // remove translation from the view matrix
 			skyboxShader.setMat4("view", view);
 			skyboxShader.setMat4("projection", projection);
 			skyboxMesh.Draw(skyboxShader);
