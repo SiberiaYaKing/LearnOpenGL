@@ -14,25 +14,26 @@
 #include <LearnOpenGL/texture_loader.h>
 #include <LearnOpenGL/geometry_data.h>
 #include <LearnOpenGL/imgui_helper.h>
+#include <LearnOpenGL/uniform_buffer.h>
 
 #include <iostream>
 #include <vector>
 #include <string>
 
-
 using namespace std;
 using namespace glm;
 
-const unsigned int SCR_WIDTH = 1280;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 550;
 const string localShaderDir("AdvanceOpenGL/advance_data_and_glsl/");
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.1f, 3.0f));
 
 int selection = 0;
 
 void drawGUI();
+
 
 int main() {
 	OpenGLWindow window; {
@@ -91,12 +92,31 @@ int main() {
 		face_paths[i] = dir_textures + "skybox/" + face_paths[i];
 	TextureLoader skyboxTexture(face_paths);
 
-	Shader pointEfx(dir_shaders + localShaderDir + "pointSize.vs", dir_shaders + localShaderDir + "pointSize.fs");
+	TextureLoader frontTexture(dir_textures + "container.jpg",0);
+	TextureLoader backTexture(dir_textures + "wall.jpg",1);
+	Shader shader(dir_shaders + localShaderDir + "advanceGLSL.vs", dir_shaders + localShaderDir + "advanceGLSL.fs");
 	Shader skyboxShader(dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.vs", dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.fs");
-	QuadData quadData;
-	Mesh quad(quadData.vertices, quadData.indices, quadData.textures);
 	CubeData cubeData;
-	Mesh skyboxMesh(cubeData.vertices, cubeData.indices, cubeData.textures);
+	Mesh box(cubeData.vertices, cubeData.indices, cubeData.textures);
+
+	//使用uniform buffer object 的例子
+	//GLuint uniformBlockIndex = glGetUniformBlockIndex(shader.ID, "Matrices");
+	//glUniformBlockBinding(shader.ID, uniformBlockIndex,0);
+	//GLuint UBOMatrices;
+	//glGenBuffers(1, &UBOMatrices);
+	//glBindBuffer(GL_UNIFORM_BUFFER, UBOMatrices);
+	//glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBOMatrices, 0, 2 * sizeof(glm::mat4));
+	//mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	//glBindBuffer(GL_UNIFORM_BUFFER, UBOMatrices);
+	//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	//封装之后的ubo
+	UniformBuffer ubo(shader.ID, "Matrices",0,2*sizeof(mat4));
+	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	ubo.setSubData(sizeof(mat4), sizeof(mat4), value_ptr(projection));
 
 	while (!window.isWindowClosed()) {
 		OpenGLWindow::calculateDeltaTime();
@@ -104,20 +124,36 @@ int main() {
 		glClearColor(0.0, 0.0, 0.5, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		mat4 model = mat4(1.0f);
 		mat4 view = camera.GetViewMatrix();
-		mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		pointEfx.use();
-		pointEfx.setMat4("model", model);
-		pointEfx.setMat4("view", view);
-		pointEfx.setMat4("projection", projection);
-		pointEfx.setFloat("pointSize", 10);
+		ubo.setSubData(0, sizeof(mat4), value_ptr(view));
+		/*glBindBuffer(GL_UNIFORM_BUFFER, UBOMatrices);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);*/
+
+		mat4 model = mat4(1.0f);
+		shader.use();
+		shader.setMat4("model", model);
+		shader.setFloat("pointSize", 10);
+		shader.setInt("selection", selection);
+		shader.setInt("frontTexture", frontTexture.getTextureUnit());
+		shader.setInt("backTexture", backTexture.getTextureUnit());
 
 		switch (selection) {
-		case 0:
+		case 0://gl_PointSize
 			glEnable(GL_PROGRAM_POINT_SIZE);
-			quad.drawPoint(pointEfx);
+			box.drawPoint(shader);
 			glDisable(GL_PROGRAM_POINT_SIZE);
+			break;
+		//gl_VertexId
+		case 1://gl_FragCoord
+			box.Draw(shader);
+			break;
+		case 2: //gl_FrontFace
+			frontTexture.activeAndBind();
+			backTexture.activeAndBind();
+			box.Draw(shader);
+			frontTexture.unactiveAndUnbind();
+			backTexture.unactiveAndUnbind();
 			break;
 		}
 
@@ -127,7 +163,7 @@ int main() {
 			view = mat4(mat3(camera.GetViewMatrix())); // remove translation from the view matrix
 			skyboxShader.setMat4("view", view);
 			skyboxShader.setMat4("projection", projection);
-			skyboxMesh.Draw(skyboxShader);
+			box.Draw(skyboxShader);
 			glDepthFunc(GL_LESS);
 		}
 
@@ -140,13 +176,14 @@ int main() {
 
 
 void drawGUI() {
-	static const char* selectionNames[1] = { "drawPoint", };
+	static const char* selectionNames[3] = { "drawPoint(gl_PointSize)","drawCube(gl_FragCood)","drawCube(gl_FrontFacing)" };
 	ImGui::Begin("ToolBox");
 	if (ImGui::TreeNode("Selection")) {
 		for (int n = 0; n < _countof(selectionNames); n++) {
-			if (ImGui::Selectable(selectionNames[n], selection == n)) { selection = n; }
-			ImGui::TreePop();
+			if (ImGui::Selectable(selectionNames[n], selection == n)) { 
+				selection = n; }
 		}
+		ImGui::TreePop();
 	}
 	float frameRate = ImGui::GetIO().Framerate;
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f /frameRate , frameRate);

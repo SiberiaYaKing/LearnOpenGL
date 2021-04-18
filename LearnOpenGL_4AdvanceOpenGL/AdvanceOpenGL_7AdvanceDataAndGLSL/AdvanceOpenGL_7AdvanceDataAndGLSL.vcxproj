@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp" />
     <ClCompile Include="AdvanceDataAndGLSL_main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="uniform_buffer.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

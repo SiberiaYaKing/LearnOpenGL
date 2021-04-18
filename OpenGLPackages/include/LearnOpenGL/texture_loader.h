@@ -11,7 +11,7 @@ public:
 	TextureLoadExeception() {}
 	TextureLoadExeception(const std::string& img_path) :img_path(img_path) {};
 	const char* what()const throw() {
-		return "Failed to load texture ";
+		return "Failed to load textureID ";
 	}
 
 };
@@ -21,18 +21,18 @@ class TextureLoader {
 public:
 	TextureLoader(GLenum target = GL_TEXTURE_2D) :target(target) {}
 
-	TextureLoader(const std::string &img_path, GLenum target = GL_TEXTURE_2D) :target(target) {
+	TextureLoader(const std::string &img_path,GLuint unit=0 ,GLenum target = GL_TEXTURE_2D) :target(target),textureUnit(unit) {
 		initTexture(img_path);
 	}
 
-	TextureLoader(const std::vector<std::string> &img_paths,GLenum target = GL_TEXTURE_CUBE_MAP):target(target) {
+	TextureLoader(const std::vector<std::string> &img_paths, GLuint unit=0,GLenum target = GL_TEXTURE_CUBE_MAP):target(target),textureUnit(unit) {
 		initCubeMap(img_paths);
 	}
 
 	void initCubeMap(const std::vector<std::string> &img_paths) {
 		try {
-			glGenTextures(1, &texture);
-			glBindTexture(target, texture);
+			glGenTextures(1, &textureID);
+			glBindTexture(target, textureID);
 			int width, height, nrChannels;
 			unsigned char* data = nullptr;
 			for (unsigned int i = 0; i < img_paths.size(); i++) {
@@ -75,29 +75,37 @@ public:
 	}
 
 	void bindTexture() {
-		glBindTexture(target, texture);
+		glBindTexture(target, textureID);
 	}
 
-	//函数已过时，不推荐使用
-	void activeAndBind(GLenum texcoord) {
-		glActiveTexture(texcoord);
-		glBindTexture(target, texture);
+	inline unsigned int getTextureID() const {
+		return  textureID;
 	}
-
-	unsigned int getTextureID() {
-		return  texture;
+	inline unsigned int getTextureUnit() const {
+		return textureUnit;
 	}
 
 	void static activeTexture(GLenum texcoord) {
 		glActiveTexture(texcoord);
 	}
+
+	inline void activeAndBind() {
+		glActiveTexture(GL_TEXTURE0 + textureUnit);
+		glBindTexture(target, textureID);
+	}
+	inline void unactiveAndUnbind() {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(target, 0);
+	}
+
 private:
-	unsigned int texture;
+	unsigned int textureID;
 	GLenum target;
+	unsigned int textureUnit;
 	
 	void _initTexture_(const std::string &img_path) {
-		glGenTextures(1, &texture);
-		glBindTexture(target, texture);
+		glGenTextures(1, &textureID);
+		glBindTexture(target, textureID);
 
 		int width, height, nrChannels;
 		unsigned char*data = stbi_load(img_path.c_str(), &width, &height, &nrChannels, 0);

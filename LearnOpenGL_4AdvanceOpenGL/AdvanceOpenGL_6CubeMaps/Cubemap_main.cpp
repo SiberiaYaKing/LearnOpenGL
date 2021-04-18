@@ -328,7 +328,7 @@ int main()
 	//Close GUI
 	/*ImGui_ImplGlfwGL3_Shutdown();
 	ImGui::DestroyContext();*/
-	ImGuiHelper::destroyImGui();
+	//ImGuiHelper::destroyImGui();
 
 
 	return 0;
