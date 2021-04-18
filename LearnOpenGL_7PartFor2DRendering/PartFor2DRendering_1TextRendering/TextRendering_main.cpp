@@ -1,4 +1,3 @@
-
 #include "pch.h"
 using namespace std;
 using namespace glm;
@@ -36,10 +35,9 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		window.processInput();
 
+		text.drawText(textShader, L"此生无悔入东方", glm::vec4(0.3, 0.7f, 0.9f, 1.0f), { 500.0f, 530.0f }, 0.5f);
 		text.drawText(textShader, L"Bad apple!!!", glm::vec4(0.5, 0.8f, 0.2f, 1.0), { 25.0f, 25.0f }, 1.0f);
-		text.drawText(textShader, L"此生无悔入东方", glm::vec4(0.3, 0.7f, 0.9f,1.0f), { 500.0f, 530.0f }, 0.5f);
 		
-
 		window.swapBuffersAndPollEvents();
 	}
 	return 0;

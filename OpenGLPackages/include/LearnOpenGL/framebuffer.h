@@ -76,7 +76,7 @@ public:
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	//«Âø’÷°ª∫≥Â
+	// ÷∂Ø«Âø’÷°ª∫≥Â
 	void clearColor(float r=1,float g=1,float b=1,float a=1) {
 		glClearColor(r,g,b,a);
 		glClear(GL_COLOR_BUFFER_BIT);

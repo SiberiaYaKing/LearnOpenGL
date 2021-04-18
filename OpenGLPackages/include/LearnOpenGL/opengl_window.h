@@ -138,4 +138,3 @@ GLFWwindow* OpenGLWindow::getWindowPtr()const {
 	return window;
 }
 
-
