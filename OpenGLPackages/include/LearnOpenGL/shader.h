@@ -2,12 +2,48 @@
 #include <glad/glad.h>; // 包含glad来获取所有的必须OpenGL头文件
 
 #include <string>
+#include <vector>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+
+class UniformBuffer {
+public:
+	UniformBuffer(GLuint shaderID, const std::string& name, GLuint bindingPoint, GLsizeiptr bufferSize) {
+		init({ shaderID, }, { name, }, bindingPoint, bufferSize);
+	}
+
+	UniformBuffer(const std::vector<GLuint> shaderIDs, const std::vector<std::string>& names, GLuint bindingPoint, GLsizeiptr bufferSize) {
+		init(shaderIDs, names, bindingPoint, bufferSize);
+	}
+
+	inline void setSubData(GLsizeiptr offset, GLsizeiptr size, const void* data) {
+		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+		glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+private:
+	void init(const std::vector<GLuint> shaderIDs, const std::vector<std::string>& names, GLuint bindingPoint, GLsizeiptr bufferSize) {
+		for (int i = 0; i < shaderIDs.size(); i++) {
+			GLuint uniformBlockIndex = glGetUniformBlockIndex(shaderIDs[i], names[i].c_str());
+			glUniformBlockBinding(shaderIDs[i], uniformBlockIndex, bindingPoint);
+		}
+		glGenBuffers(1, &UBO);
+		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+		glBufferData(GL_UNIFORM_BUFFER, bufferSize, NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, UBO, 0, bufferSize);
+	}
+
+private:
+	GLuint UBO;
+};
 
 class Shader
 {
@@ -21,15 +57,15 @@ public:
 	// 使用/激活程序
 	void use();
 	// uniform工具函数
-	void setBool(const std::string &name, bool value) const;
-	void setInt(const std::string &name, int value) const;
-	void setFloat(const std::string &name, float value) const; 
-	void setMat4(const std::string &name, glm::mat4 value)const;
-	void setVec3(const std::string &name, glm::vec3 value) const;
-	void setVec3(const std::string &name, float f1,float f2,float f3) const;
-	void setMat3(const std::string &name, glm::mat3 value)const;
-	void setVec4(const std::string& name, glm::vec4 value) const;
-	void setVec4(const std::string& name, float f1, float f2, float f3, float f4) const;
+	inline void setBool(const std::string &name, bool value) const;
+	inline void setInt(const std::string &name, int value) const;
+	inline void setFloat(const std::string &name, float value) const; 
+	inline void setMat4(const std::string &name, glm::mat4 value)const;
+	inline void setVec3(const std::string &name, glm::vec3 value) const;
+	inline void setVec3(const std::string &name, float f1,float f2,float f3) const;
+	inline void setMat3(const std::string &name, glm::mat3 value)const;
+	inline void setVec4(const std::string& name, glm::vec4 value) const;
+	inline void setVec4(const std::string& name, float f1, float f2, float f3, float f4) const;
 private:
 	void init_shader(const GLchar* vertexPath, const GLchar*  fragmentPath);
 };
@@ -148,3 +184,4 @@ void Shader::setVec4(const std::string& name, glm::vec4 value) const {
 void Shader::setVec4(const std::string& name, float f1, float f2, float f3, float f4) const {
 	glUniform4f(glGetUniformLocation(ID, name.c_str()), f1, f2, f3, f4);
 }
+

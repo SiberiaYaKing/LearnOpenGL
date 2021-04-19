@@ -58,6 +58,7 @@ private:
 	FT_Face face;
 	GLuint textVAO, textVBO;
 	GLuint mainTextureId;
+	std::vector<GLubyte> zeroBuffer;
 
 };
 
@@ -65,9 +66,11 @@ private:
 Text::Text(const std::string& fontFilePath) {
 	if (FT_Init_FreeType(&ft)) {
 		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return;
 	}
 	if (FT_New_Face(ft, fontFilePath.c_str(), 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		return;
 	}
 	FT_Set_Pixel_Sizes(face, 0, 48);
 	glPixelStoref(GL_UNPACK_ALIGNMENT, 1); //禁用字节对齐限制
@@ -85,12 +88,13 @@ Text::Text(const std::string& fontFilePath) {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	zeroBuffer.resize(MAIN_TEXT_TEX_SIZE * MAIN_TEXT_TEX_SIZE, 0);
 	//只使用一个纹理来渲染所有的字形
 	glGenTextures(1, &mainTextureId);
 	glBindTexture(GL_TEXTURE_2D, mainTextureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 
 		MAIN_TEXT_TEX_SIZE, MAIN_TEXT_TEX_SIZE,
-		0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+		0, GL_RED, GL_UNSIGNED_BYTE, zeroBuffer.data());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -184,10 +188,9 @@ bool Text::loadCharacter(wchar_t character){
 	}
 
 	glBindTexture(GL_TEXTURE_2D, mainTextureId);
-	std::vector<GLubyte> blankBuffer(MAIN_TEXT_TEX_SIZE * MAIN_TEXT_TEX_SIZE, 0);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
 		MAIN_TEXT_TEX_SIZE, MAIN_TEXT_TEX_SIZE,
-		GL_RED, GL_UNSIGNED_BYTE, blankBuffer.data());
+		GL_RED, GL_UNSIGNED_BYTE, zeroBuffer.data());
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
 		face->glyph->bitmap.width, face->glyph->bitmap.rows,
 		GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
@@ -222,7 +225,8 @@ void Text::drawText(Shader& shader, const std::wstring& text,
 		};
 		glBindTexture(GL_TEXTURE_2D, mainTextureId);
 		glBindBuffer(GL_ARRAY_BUFFER, textVBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		memcpy(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY), vertices, sizeof(vertices));
+		glUnmapBuffer(GL_ARRAY_BUFFER);
 		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
