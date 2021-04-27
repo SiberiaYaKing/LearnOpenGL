@@ -87,7 +87,7 @@ int main()
 
 	// build and compile shaders
 	// -------------------------
-	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing.fs");
+	Shader shader(dir_shaders+"AdvanceOpenGL/depth_testing/depth_testing.vs", dir_shaders+"AdvanceOpenGL/depth_testing/depth_testing.fs");
 	Shader default_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.fs");
 	Shader inversion_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/inversion.fs");
 	Shader grayscale_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/grayscale.fs");

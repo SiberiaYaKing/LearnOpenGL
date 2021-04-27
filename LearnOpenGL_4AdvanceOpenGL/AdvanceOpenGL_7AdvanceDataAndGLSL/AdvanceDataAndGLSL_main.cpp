@@ -14,7 +14,6 @@
 #include <LearnOpenGL/texture_loader.h>
 #include <LearnOpenGL/geometry_data.h>
 #include <LearnOpenGL/imgui_helper.h>
-#include <LearnOpenGL/uniform_buffer.h>
 
 #include <iostream>
 #include <vector>

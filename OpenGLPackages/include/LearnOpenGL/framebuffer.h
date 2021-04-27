@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <iostream>
+#include <vector>
 #include <LearnOpenGL/shader.h>
 
 const float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -19,30 +20,18 @@ const float quadVertices[] = { // vertex attributes for a quad that fills the en
 
 class Framebuffer {
 public:
-	Framebuffer(unsigned scr_width,unsigned scr_height) {
+	Framebuffer(unsigned bufferWidth,unsigned bufferHeight,unsigned colorBuffersCount=1) {
 		//unsigned int framebuffer;
 		glGenFramebuffers(1, &framebuffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		//生成纹理
-		//unsigned int texColorBuffer;
-		glGenTextures(1, &texColorBuffer);
-		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_width, scr_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glBindTexture(GL_TEXTURE_2D, 0);  //reset
-		//附加到帧缓冲
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+		for (int i = 0; i < colorBuffersCount; i++) {
+			attachColorBuffer(bufferWidth, bufferHeight,i);
+		}
 
-		//render buffer
-		//------------------------
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		//针对深度缓冲和模板缓冲不用采样的优化手段，生成并设置渲染缓冲
-		//unsigned int rbo;
 		glGenRenderbuffers(1, &rbo);
 		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, scr_width, scr_height);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0); //reset
 		//附加到缓冲
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
@@ -66,6 +55,8 @@ public:
 		static VGC gc(screenVAO, screenVBO);
 	}
 
+
+
 	void switch2Framebuffer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glEnable(GL_DEPTH_TEST);
@@ -85,7 +76,9 @@ public:
 	void drawFramebuffer2Defaultbuffer(Shader screenShader) {
 		screenShader.use();
 		glBindVertexArray(screenVAO);
-		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+		for (GLuint colorBuffer : colorBuffers) {
+			glBindTexture(GL_TEXTURE_2D, colorBuffer);
+		}
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
@@ -100,9 +93,34 @@ private:
 		}
 	};
 
+	void attachColorBuffer(unsigned bufferWidth, unsigned bufferHeight, unsigned index) {
+		increaseBufferID(index);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		//生成纹理
+		glGenTextures(1, &colorBuffers[index]);
+		glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bufferWidth, bufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glBindTexture(GL_TEXTURE_2D, 0);  //reset
+		//附加到帧缓冲
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[index], GL_TEXTURE_2D, colorBuffers[index], 0);
+		glDrawBuffers(attachments.size(), attachments.data());
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); //reset
+	}
+
+	void increaseBufferID(unsigned index) {
+		colorBuffers.push_back(index);
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + index);
+	}
+
 private:
 	unsigned int framebuffer;
-	unsigned int texColorBuffer;
+	//unsigned int texColorBuffer;
 	unsigned int rbo;
 	unsigned int screenVAO, screenVBO;
+	std::vector<GLuint> colorBuffers;
+	std::vector<GLuint> attachments;
 };
