@@ -17,8 +17,8 @@ public:
 		init({ shaderID, }, { name, }, bindingPoint, bufferSize);
 	}
 
-	UniformBuffer(const std::vector<GLuint> shaderIDs, const std::vector<std::string>& names, GLuint bindingPoint, GLsizeiptr bufferSize) {
-		init(shaderIDs, names, bindingPoint, bufferSize);
+	UniformBuffer(const std::vector<GLuint> shaderIDs, const std::string& name, GLuint bindingPoint, GLsizeiptr bufferSize) {
+		init(shaderIDs, name, bindingPoint, bufferSize);
 	}
 
 	inline void setSubData(GLsizeiptr offset, GLsizeiptr size, const void* data) {
@@ -28,9 +28,9 @@ public:
 	}
 
 private:
-	void init(const std::vector<GLuint> shaderIDs, const std::vector<std::string>& names, GLuint bindingPoint, GLsizeiptr bufferSize) {
+	void init(const std::vector<GLuint> shaderIDs, const std::string & name, GLuint bindingPoint, GLsizeiptr bufferSize) {
 		for (int i = 0; i < shaderIDs.size(); i++) {
-			GLuint uniformBlockIndex = glGetUniformBlockIndex(shaderIDs[i], names[i].c_str());
+			GLuint uniformBlockIndex = glGetUniformBlockIndex(shaderIDs[i], name.c_str());
 			glUniformBlockBinding(shaderIDs[i], uniformBlockIndex, bindingPoint);
 		}
 		glGenBuffers(1, &UBO);
@@ -55,7 +55,7 @@ public:
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	Shader(const std::string& vertexPath, const std::string& fragmentPath);
 	// 使用/激活程序
-	void use();
+	void use() const;
 	// uniform工具函数
 	inline void setBool(const std::string &name, bool value) const;
 	inline void setInt(const std::string &name, int value) const;
@@ -145,7 +145,7 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	init_shader(vertexPath.c_str(), fragmentPath.c_str());
 }
 
-void Shader::use() {
+void Shader::use() const{
 	glUseProgram(ID);
 }
 

@@ -30,8 +30,8 @@ struct Vertex {
 
 struct Texture {
 	unsigned int id;
-	string type;
-	string path;
+	std::string type;
+	std::string path;
 };
 
 class Mesh {
@@ -55,7 +55,7 @@ public:
 	}
 
 	// render the mesh
-	void Draw(Shader shader)
+	void Draw(Shader &shader)
 	{
 		// bind appropriate textures
 		unsigned int diffuseNr = 1;

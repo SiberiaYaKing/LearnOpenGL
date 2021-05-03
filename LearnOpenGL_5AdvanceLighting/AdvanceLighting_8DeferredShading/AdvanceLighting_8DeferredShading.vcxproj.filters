@@ -3,7 +3,7 @@
   <ItemGroup>
     <Filter Include="源文件">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="头文件">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -14,10 +14,10 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="源文件\package_src">
-      <UniqueIdentifier>{fa8b434f-3c7b-402d-bd9c-0a3706da072a}</UniqueIdentifier>
+      <UniqueIdentifier>{8b361dbb-64f6-49e9-a0fb-f88e055d23a1}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\package_src\imgui">
-      <UniqueIdentifier>{4bfea764-8349-494f-a78b-5e51a4796789}</UniqueIdentifier>
+      <UniqueIdentifier>{ea8296a3-b8e4-4b64-961e-eb87c2f6fa92}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,7 +39,7 @@
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp">
       <Filter>源文件\package_src</Filter>
     </ClCompile>
-    <ClCompile Include="TextRendering_main.cpp">
+    <ClCompile Include="DeferredShading_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

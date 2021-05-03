@@ -7,7 +7,7 @@
 #include <LearnOpenGL/opengl_window.h>
 #include <LearnOpenGL/assets_directory.h>
 #include <LearnOpenGL/texture_loader.h>
-#include <LearnOpenGL/model.h>
+#include <model_.h>
 
 #include <iostream>
 #include <math.h>
@@ -206,10 +206,11 @@ int main() {
 		model = translate(model, glm::vec3(-1,-2,-1));
 		model = scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 		lightingShader.setMat4("model", model);
+		nanosuit.Draw(lightingShader);
 
 		Drawlamp(lampShader, model, projection, view, lightVAO);
 
-		nanosuit.Draw(lightingShader);
+		
 		
 
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

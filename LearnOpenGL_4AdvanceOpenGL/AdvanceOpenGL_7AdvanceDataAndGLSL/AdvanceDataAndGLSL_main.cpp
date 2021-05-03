@@ -113,7 +113,7 @@ int main() {
 	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	//封装之后的ubo
-	UniformBuffer ubo(shader.ID, "Matrices",0,2*sizeof(mat4));
+	UniformBuffer ubo(shader.ID, "Matrices",0, 2*sizeof(mat4));
 	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 	ubo.setSubData(sizeof(mat4), sizeof(mat4), value_ptr(projection));
 

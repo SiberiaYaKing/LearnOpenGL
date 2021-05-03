@@ -116,7 +116,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		mat->GetTexture(type, i, &str);
 		bool is_skip = false;
 		for (unsigned int j = 0; j < textures_loaded.size(); j++) 
-			if (textures_loaded[j].path == str) {
+			if (textures_loaded[j].path == str.C_Str()) {
 				textures.push_back(textures_loaded[j]);
 				is_skip = true;
 				break;
@@ -127,7 +127,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 			TextureLoader tLoader(full_path);
 			texture.id = tLoader.getTextureID();
 			texture.type = typeName;
-			texture.path = str;
+			texture.path = str.C_Str();
 			textures.push_back(texture);
 		}
 	}

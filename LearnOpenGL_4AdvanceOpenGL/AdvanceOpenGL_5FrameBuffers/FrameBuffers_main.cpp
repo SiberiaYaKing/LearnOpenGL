@@ -190,7 +190,8 @@ int main()
 	shader.setInt("texture1", 0);
 
 
-	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT);
+	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT,0);
+	framebuffer.attachBuffer(SCR_WIDTH, SCR_HEIGHT, 0);
 
 	//init GUI
 	ImGui::CreateContext();

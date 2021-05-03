@@ -20,11 +20,11 @@ const float quadVertices[] = { // vertex attributes for a quad that fills the en
 
 class Framebuffer {
 public:
-	Framebuffer(unsigned bufferWidth,unsigned bufferHeight,unsigned colorBuffersCount=1) {
+	Framebuffer(unsigned bufferWidth,unsigned bufferHeight,unsigned autoAttachBufferCount=1) {
 		//unsigned int framebuffer;
 		glGenFramebuffers(1, &framebuffer);
-		for (int i = 0; i < colorBuffersCount; i++) {
-			attachColorBuffer(bufferWidth, bufferHeight,i);
+		for (int i = 0; i < autoAttachBufferCount; i++) {
+			attachBuffer(bufferWidth, bufferHeight,i);
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -55,7 +55,30 @@ public:
 		static VGC gc(screenVAO, screenVBO);
 	}
 
+	void attachBuffer(unsigned bufferWidth, unsigned bufferHeight, unsigned index,GLuint textureFormat = GL_RGB ,GLuint channelFormat = GL_RGB, GLuint dataType = GL_UNSIGNED_BYTE) {
+		increaseBufferID(index);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		//生成纹理
+		glGenTextures(1, &colorBuffers[index]);
+		glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
+		glTexImage2D(GL_TEXTURE_2D, 0, textureFormat, bufferWidth, bufferHeight, 0, channelFormat, dataType, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glBindTexture(GL_TEXTURE_2D, 0);  //reset
+		//附加到帧缓冲
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[index], GL_TEXTURE_2D, colorBuffers[index], 0);
+		glDrawBuffers(attachments.size(), attachments.data());
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); //reset
+	}
 
+	int getBuffer(GLuint index) const{
+		if (index < colorBuffers.size()) {
+			return colorBuffers[index];
+		}
+		else return colorBuffers.back();
+	}
 
 	void switch2Framebuffer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -93,23 +116,6 @@ private:
 		}
 	};
 
-	void attachColorBuffer(unsigned bufferWidth, unsigned bufferHeight, unsigned index) {
-		increaseBufferID(index);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		//生成纹理
-		glGenTextures(1, &colorBuffers[index]);
-		glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bufferWidth, bufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glBindTexture(GL_TEXTURE_2D, 0);  //reset
-		//附加到帧缓冲
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[index], GL_TEXTURE_2D, colorBuffers[index], 0);
-		glDrawBuffers(attachments.size(), attachments.data());
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); //reset
-	}
 
 	void increaseBufferID(unsigned index) {
 		colorBuffers.push_back(index);

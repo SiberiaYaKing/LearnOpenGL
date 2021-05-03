@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{73436228-25e1-4cfc-8887-7e6b6507a048}</ProjectGuid>
-    <RootNamespace>PartFor2DRendering1TextRendering</RootNamespace>
+    <ProjectGuid>{f6ff9bb7-50c8-41ea-9e4b-45de150a887a}</ProjectGuid>
+    <RootNamespace>AdvanceLighting8DeferredShading</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -149,7 +149,7 @@
     <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\OpenGLPackages\src\imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="..\..\OpenGLPackages\src\stb_image.cpp" />
-    <ClCompile Include="TextRendering_main.cpp" />
+    <ClCompile Include="DeferredShading_main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

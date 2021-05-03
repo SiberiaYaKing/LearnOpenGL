@@ -19,7 +19,7 @@ struct Vertex {
 struct Texture {
 	unsigned int id;
 	std::string type;
-	aiString path;
+	std::string path;
 };
 
 
@@ -97,8 +97,8 @@ void Mesh::setupMesh() {
 }
 
 void Mesh::Draw(Shader shader) {
-	unsigned int diffuseNr = 0;
-	unsigned int specularNr = 0;
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
 	shader.use();
 	//是否有贴图
 	if (textures.size()) {
@@ -114,7 +114,6 @@ void Mesh::Draw(Shader shader) {
 			shader.setInt( name + number, i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
-		glActiveTexture(GL_TEXTURE0);   //设置纹理单元为默认值
 	}
 	else  shader.setBool("has_texture", false);
 
@@ -127,7 +126,8 @@ void Mesh::Draw(Shader shader) {
 	glBindVertexArray(0); //解绑
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//glActiveTexture(0);
+	//解绑贴图
+	glActiveTexture(0);
 }
 
 void Mesh::drawPoint(Shader shader) {
