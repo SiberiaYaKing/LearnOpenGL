@@ -29,12 +29,12 @@ public:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		//针对深度缓冲和模板缓冲不用采样的优化手段，生成并设置渲染缓冲
-		glGenRenderbuffers(1, &rbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glGenRenderbuffers(1, &depthStencilBuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0); //reset
 		//附加到缓冲
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
 		//检查帧缓冲是否完整
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
@@ -73,21 +73,24 @@ public:
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); //reset
 	}
 
-	int getBuffer(GLuint index) const{
+	int getColorBuffer(GLuint index) const{
 		if (index < colorBuffers.size()) {
 			return colorBuffers[index];
 		}
 		else return colorBuffers.back();
 	}
 
+
+	inline int getFrameBuffer() const { 
+		return framebuffer; 
+	}
+
 	void switch2Framebuffer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glEnable(GL_DEPTH_TEST);
 	}
 
 	void switch2Defaultbuffer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDisable(GL_DEPTH_TEST);
 	}
 
 	//手动清空帧缓冲
@@ -123,10 +126,9 @@ private:
 	}
 
 private:
-	unsigned int framebuffer;
-	//unsigned int texColorBuffer;
-	unsigned int rbo;
-	unsigned int screenVAO, screenVBO;
+	GLuint framebuffer;
+	GLuint depthStencilBuffer;
+	GLuint screenVAO, screenVBO;
 	std::vector<GLuint> colorBuffers;
 	std::vector<GLuint> attachments;
 };

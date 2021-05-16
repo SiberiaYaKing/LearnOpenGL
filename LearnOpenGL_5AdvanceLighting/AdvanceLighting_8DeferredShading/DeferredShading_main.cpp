@@ -73,6 +73,7 @@ int main() {
 	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 	// ========================设置渲染对象=========================
+	// prepare Gbuffer
 	Framebuffer gBuffer(SCR_WIDTH, SCR_HEIGHT,0);
 	// position buffer
 	gBuffer.attachBuffer(SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB16F, GL_RGB, GL_FLOAT);
@@ -81,6 +82,8 @@ int main() {
 	// albedo + specular buffer
 	gBuffer.attachBuffer(SCR_WIDTH, SCR_HEIGHT, 2, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	Shader shaderGeometryPass(localShaderDir + "gBufferShader.vs", localShaderDir + "gBufferShader.fs");
+
+	//perpare model
 	Model nanosuit(dir_models + "nanosuit/nanosuit.obj");
 	vector<glm::vec3> objectPositions;
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
@@ -93,6 +96,30 @@ int main() {
 	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
 
+	Shader lampShader(dir_shaders + "lampShader.vs", dir_shaders + "lampShader.fs");
+	CubeData cubedata;
+	Mesh lampCube(cubedata.vertices, cubedata.indices, cubedata.textures);
+
+	// perpare Lights
+	const GLuint NR_LIGHTS = 32;
+	vector<vec3> lightPositions;
+	vector<vec3> lightColors;
+	srand(13);
+	for (GLuint i = 0; i < NR_LIGHTS; i++)
+	{
+		// Calculate slightly random offsets
+		GLfloat xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+		GLfloat yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
+		GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+		// Also calculate random color
+		GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+		GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+		GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
+	}
+
+	// prepare Shader
 	Shader showGBufferShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", localShaderDir+"showGBuffer.fs");
 	showGBufferShader.use();
 	showGBufferShader.setInt("positionTex", 0);
@@ -101,12 +128,12 @@ int main() {
 	// ============================================================
 
 	/* ==============Set up skybox=============== */ 
-	//vector<string> face_paths{ "right.jpg","left.jpg","top.jpg","bottom.jpg","front.jpg","back.jpg" };
-	//for (int i = 0; i < face_paths.size(); i++) {face_paths[i] = dir_textures + "skybox/" + face_paths[i];}
-	//TextureLoader skyboxTexture(face_paths);
-	//Shader skyboxShader(dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.vs", dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.fs");
-	//CubeData cubeData;
-	//Mesh box(cubeData.vertices, cubeData.indices, cubeData.textures);
+	vector<string> face_paths{ "right.jpg","left.jpg","top.jpg","bottom.jpg","front.jpg","back.jpg" };
+	for (int i = 0; i < face_paths.size(); i++) {face_paths[i] = dir_textures + "skybox/" + face_paths[i];}
+	TextureLoader skyboxTexture(face_paths);
+	Shader skyboxShader(dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.vs", dir_shaders + "AdvanceOpenGL/cubemap/skyboxShader.fs");
+	CubeData cubeData;
+	Mesh box(cubeData.vertices, cubeData.indices, cubeData.textures);
 	/* ========================================== */
 
 	while (!window.isWindowClosed()) {
@@ -120,13 +147,14 @@ int main() {
 		mat4 model;
 
 		// =========================绘制其他渲染对象=====================
-		shaderGeometryPass.use();
-		shaderGeometryPass.setMat4("projection", projection);
-		shaderGeometryPass.setMat4("view", view);
 		
+		/*Gbuffer pass*/
 		gBuffer.switch2Framebuffer();
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shaderGeometryPass.use();
+		shaderGeometryPass.setMat4("projection", projection);
+		shaderGeometryPass.setMat4("view", view);
 		for (GLuint i = 0; i < objectPositions.size(); i++)
 		{
 			model = glm::mat4();
@@ -137,30 +165,61 @@ int main() {
 		}
 		gBuffer.switch2Defaultbuffer();
 
-		if (selection > 0) {
-			showGBufferShader.use();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, gBuffer.getBuffer(0));
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, gBuffer.getBuffer(1));
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, gBuffer.getBuffer(2));
-			showGBufferShader.setInt("selection", selection);
-			gBuffer.drawFramebuffer2Defaultbuffer(showGBufferShader);
-			glActiveTexture(0);
+		/*draw framebuffer*/
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorBuffer(0));
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorBuffer(1));
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorBuffer(2));
+		showGBufferShader.use();
+		showGBufferShader.setInt("selection", selection);
+		if(selection==0) {
+			for (GLuint i = 0; i < NR_LIGHTS; i++) {
+				showGBufferShader.setVec3("lights[" + to_string(i) + "].Position", lightPositions[i]);
+				showGBufferShader.setVec3("lights[" + to_string(i) + "].Color", lightColors[i]);
+				const float linear = 0.7;
+				const float quadratic = 1.8;
+				showGBufferShader.setFloat("lights[" + to_string(i) + "].Linear", linear);
+				showGBufferShader.setFloat("lights[" + to_string(i) + "].Quadratic", quadratic);
+			}
+			showGBufferShader.setVec3("viewPos", camera.Position);
+		}
+		gBuffer.drawFramebuffer2Defaultbuffer(showGBufferShader);
+		glActiveTexture(0);
+
+		/*copy gbuffer's depth to default framebuffer's depth*/
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer.getFrameBuffer());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		/*Draw lamp object*/
+		lampShader.use();
+		lampShader.setMat4("projection", projection);
+		lampShader.setMat4("view", view);
+		for (GLuint i = 0; i < NR_LIGHTS; i++)
+		{
+			model = translate(mat4(), lightPositions[i]);
+			model = scale(model, glm::vec3(0.25f));
+			lampShader.setMat4("model", model);
+			lampShader.setVec3("lightDiff", lightColors[i]);
+			lampCube.Draw(lampShader);
 		}
 
 		// =============================================================
 
-		///*Draw skybox*/ {
-		//	glDepthFunc(GL_LEQUAL);
-		//	skyboxShader.use();
-		//	view = mat4(mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-		//	skyboxShader.setMat4("view", view);
-		//	skyboxShader.setMat4("projection", projection);
-		//	box.Draw(skyboxShader);
-		//	glDepthFunc(GL_LESS);
-		//}
+		/*Draw skybox*/ {
+			glDepthFunc(GL_LEQUAL);
+			skyboxTexture.activeAndBind();
+			skyboxShader.use();
+			view = mat4(mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+			skyboxShader.setMat4("view", view);
+			skyboxShader.setMat4("projection", projection);
+			box.Draw(skyboxShader);
+			skyboxTexture.unactiveAndUnbind();
+			glDepthFunc(GL_LESS);
+		}
 		
 		ImGuiHelper::drawImGui(drawGUI);
 		window.swapBuffersAndPollEvents();
