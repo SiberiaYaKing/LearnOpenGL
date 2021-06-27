@@ -136,6 +136,10 @@ int main() {
 	Mesh box(cubeData.vertices, cubeData.indices, cubeData.textures);
 	/* ========================================== */
 
+	const float constant = 1.0;
+	const float linear = 0.7;
+	const float quadratic = 1.8;
+
 	while (!window.isWindowClosed()) {
 		OpenGLWindow::calculateDeltaTime();
 		window.processInput();
@@ -178,10 +182,14 @@ int main() {
 			for (GLuint i = 0; i < NR_LIGHTS; i++) {
 				showGBufferShader.setVec3("lights[" + to_string(i) + "].Position", lightPositions[i]);
 				showGBufferShader.setVec3("lights[" + to_string(i) + "].Color", lightColors[i]);
-				const float linear = 0.7;
-				const float quadratic = 1.8;
+				
 				showGBufferShader.setFloat("lights[" + to_string(i) + "].Linear", linear);
 				showGBufferShader.setFloat("lights[" + to_string(i) + "].Quadratic", quadratic);
+
+				
+				GLfloat lightMax = std::fmaxf(std::fmaxf(lightColors[i].r, lightColors[i].g), lightColors[i].b);
+				GLfloat radius =(-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * lightMax))) / (2 * quadratic);
+				showGBufferShader.setFloat("lights[" + to_string(i) + "].Radius", radius);
 			}
 			showGBufferShader.setVec3("viewPos", camera.Position);
 		}
