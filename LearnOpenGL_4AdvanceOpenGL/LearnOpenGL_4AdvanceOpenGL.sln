@@ -13,7 +13,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_5FrameBuffers
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_6Cubemaps", "AdvanceOpenGL_6CubeMaps\AdvanceOpenGL_6CubeMaps.vcxproj", "{0CBDBA2C-ABB5-4821-8CF0-6423A866A6B6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_7AdvanceDataAndGLSL", "AdvanceOpenGL_7AdvanceDataAndGLSL\AdvanceOpenGL_7AdvanceDataAndGLSL.vcxproj", "{57A738CA-449B-4F26-8ADD-72C12F4862EF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_8AdvanceDataAndGLSL", "AdvanceOpenGL_7AdvanceDataAndGLSL\AdvanceOpenGL_7AdvanceDataAndGLSL.vcxproj", "{57A738CA-449B-4F26-8ADD-72C12F4862EF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvanceOpenGL_11AntiAliasing", "AdvanceOpenGL_11AntiAliasing\AdvanceOpenGL_11AntiAliasing.vcxproj", "{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x64.Build.0 = Release|x64
 		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x86.ActiveCfg = Release|Win32
 		{57A738CA-449B-4F26-8ADD-72C12F4862EF}.Release|x86.Build.0 = Release|Win32
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Debug|x64.ActiveCfg = Debug|x64
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Debug|x64.Build.0 = Debug|x64
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Debug|x86.ActiveCfg = Debug|Win32
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Debug|x86.Build.0 = Debug|Win32
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Release|x64.ActiveCfg = Release|x64
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Release|x64.Build.0 = Release|x64
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Release|x86.ActiveCfg = Release|Win32
+		{4AE9A688-AD6D-4866-BA88-4189CC57BDD8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -20,7 +20,8 @@ const float quadVertices[] = { // vertex attributes for a quad that fills the en
 
 class Framebuffer {
 public:
-	Framebuffer(unsigned bufferWidth,unsigned bufferHeight,unsigned autoAttachBufferCount=1) {
+	Framebuffer(unsigned bufferWidth,unsigned bufferHeight,unsigned autoAttachBufferCount=1, bool enableMSAA=false, int samplerCount=4):
+		enableMSAA(enableMSAA),samplerCount(samplerCount){
 		//unsigned int framebuffer;
 		glGenFramebuffers(1, &framebuffer);
 		for (int i = 0; i < autoAttachBufferCount; i++) {
@@ -31,7 +32,13 @@ public:
 		//针对深度缓冲和模板缓冲不用采样的优化手段，生成并设置渲染缓冲
 		glGenRenderbuffers(1, &depthStencilBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight);
+		if (!enableMSAA) {
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight);
+		}
+		else if (enableMSAA) {
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER, samplerCount, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight);
+		}
+			
 		glBindRenderbuffer(GL_RENDERBUFFER, 0); //reset
 		//附加到缓冲
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
@@ -60,15 +67,30 @@ public:
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		//生成纹理
 		glGenTextures(1, &colorBuffers[index]);
-		glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
-		glTexImage2D(GL_TEXTURE_2D, 0, textureFormat, bufferWidth, bufferHeight, 0, channelFormat, dataType, NULL);
+		
+		if (!enableMSAA) {
+			glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
+			glTexImage2D(GL_TEXTURE_2D, 0, textureFormat, bufferWidth, bufferHeight, 0, channelFormat, dataType, NULL);
+		}
+		else if (enableMSAA) {
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, colorBuffers[index]);
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samplerCount, textureFormat, bufferWidth, bufferHeight,GL_TRUE);
+		}
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glBindTexture(GL_TEXTURE_2D, 0);  //reset
-		//附加到帧缓冲
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[index], GL_TEXTURE_2D, colorBuffers[index], 0);
+		if (!enableMSAA) {
+			glBindTexture(GL_TEXTURE_2D, 0);  //reset
+			//附加到帧缓冲
+			glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[index], GL_TEXTURE_2D, colorBuffers[index], 0);
+		}
+		else if (enableMSAA) {
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+			//附加到帧缓冲
+			glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[index], GL_TEXTURE_2D_MULTISAMPLE, colorBuffers[index], 0);
+		}
+
 		glDrawBuffers(attachments.size(), attachments.data());
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); //reset
 	}
@@ -129,6 +151,8 @@ private:
 	GLuint framebuffer;
 	GLuint depthStencilBuffer;
 	GLuint screenVAO, screenVBO;
+	bool enableMSAA;
+	int samplerCount;
 	std::vector<GLuint> colorBuffers;
 	std::vector<GLuint> attachments;
 };

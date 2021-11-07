@@ -245,8 +245,10 @@ int main()
 		}
 
 		framebuffer.switch2Defaultbuffer();
-		glClearColor(1.0f, 1.0f, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, framebuffer.getColorBuffer(0));
 		/*screen shader setting*/
 		switch(screenEffectSelection){
 			case 0:
@@ -272,6 +274,7 @@ int main()
 				break;
 			default: break;
 		}
+		glActiveTexture(0);
 		
 		DrawGUI();
 

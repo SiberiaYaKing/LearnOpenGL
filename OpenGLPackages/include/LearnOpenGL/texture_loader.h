@@ -85,6 +85,10 @@ public:
 		return textureUnit;
 	}
 
+	inline void setTextureUnit(int unit) {
+		textureUnit = unit;
+	}
+
 	void static activeTexture(GLenum texcoord) {
 		glActiveTexture(texcoord);
 	}

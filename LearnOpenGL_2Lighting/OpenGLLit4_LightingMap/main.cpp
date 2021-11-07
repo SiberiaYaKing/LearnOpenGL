@@ -136,6 +136,9 @@ int main() {
 	diffuseMap.initTexture(dir_textures+"container2.png");
 	emissiomMap.initTexture(dir_textures+"matrix.jpg"); 
 	specularMap.initTexture(dir_textures+"container2_specular.png");
+	diffuseMap.setTextureUnit(0);
+	specularMap.setTextureUnit(1);
+	emissiomMap.setTextureUnit(2);
 	//emissiomMap.SetFiltering(GL_NEAREST);
 	//emissiomMap.SetMipmapFiltering(GL_LINEAR_MIPMAP_NEAREST);
 	//emissiomMap.SetWrapping(GL_CLAMP_TO_EDGE);
@@ -175,9 +178,9 @@ int main() {
 		//glActiveTexture(GL_TEXTURE2);
 		//glBindTexture(GL_TEXTURE_2D, emissionMap);
 		//=============================================
-		diffuseMap.activeAndBind(GL_TEXTURE0);
-		specularMap.activeAndBind(GL_TEXTURE1);
-		emissiomMap.activeAndBind(GL_TEXTURE2);
+		diffuseMap.activeAndBind();
+		specularMap.activeAndBind();
+		emissiomMap.activeAndBind();
 
 
 		lightingShader.use();

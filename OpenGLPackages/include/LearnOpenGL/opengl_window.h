@@ -23,6 +23,13 @@ public:
 	}
 };
 
+class SetMSAAException : public OpenGLWindowException {
+public:
+	const char* what() const throw() {
+		return "SamplerCount must be 2,4,8 or 16!!!!\n";
+	}
+};
+
 class OpenGLWindow {
 private:
 	GLFWwindow *window = nullptr;
@@ -52,6 +59,17 @@ public:
 	}
 	void getWindowSize(int *width,int *height) const {
 		if(window) glfwGetWindowSize(window, width, height);
+	}
+	inline void enableMSAA(int samplerCount) {
+		if (samplerCount != 2 && samplerCount != 4 && samplerCount != 8 && samplerCount != 16) {
+			throw SetMSAAException();
+		}
+		glfwWindowHint(GLFW_SAMPLES, samplerCount);
+		glEnable(GL_MULTISAMPLE);
+	}
+	inline void disableMSAA() {
+		glfwWindowHint(GLFW_SAMPLES, 1);
+		glDisable(GL_MULTISAMPLE);
 	}
 public:
 	static float deltaTime;

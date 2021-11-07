@@ -166,6 +166,9 @@ int main() {
 	TextureLoader emissiomMap,diffuseMap,specularMap;
 	diffuseMap.initTexture(dir_textures+"container2.png"); 
 	specularMap.initTexture(dir_textures+"container2_specular.png");
+	diffuseMap.setTextureUnit(0);
+	specularMap.setTextureUnit(1);
+
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -186,8 +189,8 @@ int main() {
 		mat4 model = mat4(1.0f);
 		mat3 normalMat = mat3(transpose(inverse(model)));
 
-		diffuseMap.activeAndBind(GL_TEXTURE0);
-		specularMap.activeAndBind(GL_TEXTURE1);
+		diffuseMap.activeAndBind();
+		specularMap.activeAndBind();
 
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", myCam.Position);
