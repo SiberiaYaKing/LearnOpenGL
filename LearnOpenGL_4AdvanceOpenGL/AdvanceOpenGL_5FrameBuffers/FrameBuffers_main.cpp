@@ -190,8 +190,7 @@ int main()
 	shader.setInt("texture1", 0);
 
 
-	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT,0);
-	framebuffer.attachBuffer(SCR_WIDTH, SCR_HEIGHT, 0);
+	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT,1);
 
 	//init GUI
 	ImGui::CreateContext();
@@ -247,8 +246,7 @@ int main()
 		framebuffer.switch2Defaultbuffer();
 		glClearColor(0.0f, 0.0f, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, framebuffer.getColorBuffer(0));
+		framebuffer.bindColorBuffer();
 		/*screen shader setting*/
 		switch(screenEffectSelection){
 			case 0:
@@ -259,12 +257,12 @@ int main()
 			case 1:
 				inversion_screenShader.use();
 				inversion_screenShader.setInt("screenTexture", 0);
-				framebuffer.drawFramebuffer2Defaultbuffer(inversion_screenShader);
+				framebuffer.drawFramebuffer2Defaultbuffer(grayscale_screenShader);
 				break;
 			case 2:
 				grayscale_screenShader.use();
 				grayscale_screenShader.setInt("screenTexture", 0);
-				framebuffer.drawFramebuffer2Defaultbuffer(grayscale_screenShader);
+				framebuffer.drawFramebuffer2Defaultbuffer(inversion_screenShader);
 				break;
 			case 3: case 4: case 5:
 				kernel_screenShader.use();

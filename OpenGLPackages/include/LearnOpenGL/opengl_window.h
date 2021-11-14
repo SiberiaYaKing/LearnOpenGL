@@ -35,7 +35,7 @@ private:
 	GLFWwindow *window = nullptr;
 	void(*inputProcessor)(const OpenGLWindow& ) = nullptr;
 public:
-	void initWindow(unsigned int width,unsigned int height,const std::string &name);
+	void initWindow(unsigned int width,unsigned int height,const std::string &name, int samplerCount=1);
 	void setCursorDisable() const;
 	void setCursorEnable() const;
 	void setCursorPosCallback(GLFWcursorposfun cbfun);
@@ -60,16 +60,14 @@ public:
 	void getWindowSize(int *width,int *height) const {
 		if(window) glfwGetWindowSize(window, width, height);
 	}
-	inline void enableMSAA(int samplerCount) {
-		if (samplerCount != 2 && samplerCount != 4 && samplerCount != 8 && samplerCount != 16) {
-			throw SetMSAAException();
+	inline void enableMSAA(bool isOn) {
+		if (isOn) {
+			glEnable(GL_MULTISAMPLE);
 		}
-		glfwWindowHint(GLFW_SAMPLES, samplerCount);
-		glEnable(GL_MULTISAMPLE);
-	}
-	inline void disableMSAA() {
-		glfwWindowHint(GLFW_SAMPLES, 1);
-		glDisable(GL_MULTISAMPLE);
+		else {
+			glDisable(GL_MULTISAMPLE);
+		}
+		
 	}
 public:
 	static float deltaTime;
@@ -93,11 +91,16 @@ float OpenGLWindow::deltaTime = 0.0f;
 float OpenGLWindow::lastX = 0.0f;
 float OpenGLWindow::lastY = 0.0f;
 
-void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name) {
+void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std::string &name, int samplerCount) {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	if (samplerCount != 1 && samplerCount != 2 && samplerCount != 4 && samplerCount != 8 && samplerCount != 16) {
+		throw SetMSAAException();
+	}
+	glfwWindowHint(GLFW_SAMPLES, samplerCount);
+	
 #ifdef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -118,6 +121,7 @@ void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std
 	}
 	lastX = (float)width / 2;
 	lastY = (float)height / 2;
+	enableMSAA(false); // Ä¬ÈÏ²»¿ªÆôMSAA
 }
 
 OpenGLWindow::~OpenGLWindow() {

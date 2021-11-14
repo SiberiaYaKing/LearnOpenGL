@@ -15,7 +15,7 @@ void drawGUI();
 
 int main() {
 	OpenGLWindow window; {
-		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceLighting_DeferredShading"); }
+		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceLighting_DeferredShading",4); }
 		catch (OpenGLWindowException e) {
 			cout << e.what() << endl;
 			return -1;
@@ -168,14 +168,10 @@ int main() {
 			nanosuit.Draw(shaderGeometryPass);
 		}
 		gBuffer.switch2Defaultbuffer();
-
+		glClearColor(0.0f, 0.0f, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		/*draw framebuffer*/
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorBuffer(0));
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorBuffer(1));
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorBuffer(2));
+		gBuffer.bindColorBuffer();
 		showGBufferShader.use();
 		showGBufferShader.setInt("selection", selection);
 		if(selection==0) {

@@ -11,6 +11,8 @@ Camera camera(glm::vec3(0.0f, 0.1f, 3.0f));
 void drawGUI();
 
 bool enableMSAA = false;
+bool useFrameBuffer = true;
+bool enableBlur = true;
 
 
 struct DirectionLight
@@ -24,7 +26,7 @@ struct DirectionLight
 
 int main() {
 	OpenGLWindow window; {
-		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL"); }
+		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL",4); }
 		catch (OpenGLWindowException e) {
 			cout << e.what() << endl;
 			return -1;
@@ -77,17 +79,21 @@ int main() {
 		window.setScrollCallback([](GLFWwindow* pw, double xoff, double yoff) {
 			camera.ProcessMouseScroll(yoff);
 		});
+		window.enableMSAA(enableMSAA);
 	}
 
 	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 	// ========================设置渲染对象=========================
+	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT,1,true,4);
+	Framebuffer intermediateFB(SCR_WIDTH, SCR_HEIGHT,1);
+
 	CubeData boxData;
 	Mesh box(boxData.vertices, boxData.indices, boxData.textures);
 	Shader boxShader(dir_shaders + "StandardPhong.vs", dir_shaders + "StandardPhong.fs");
-
-	//window.disableMSAA();
-	window.enableMSAA(4);
+	Shader default_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.fs");
+	Shader kernel_screenShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/kernel_processing.fs");
+	glEnable(GL_DEPTH_TEST);
 	// ============================================================
 
 	/* ==============Set up skybox=============== */ 
@@ -102,9 +108,14 @@ int main() {
 	while (!window.isWindowClosed()) {
 		OpenGLWindow::calculateDeltaTime();
 		window.processInput();
+
+		if (useFrameBuffer) {
+			framebuffer.switch2Framebuffer();
+		}
+
 		glClearColor(1, 1.0, 1.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
+		
 
 		mat4 view = camera.GetViewMatrix();
 
@@ -123,27 +134,47 @@ int main() {
 		boxShader.setVec3("dirLight.direction", light.lightDir);
 		box.Draw(boxShader);
 
-		if (enableMSAA) {
-			window.enableMSAA(4);
-		}
-		else {
-			window.disableMSAA();
-		}
-
 		// =============================================================
 
-		///*Draw skybox*/ {
-		//	glDepthFunc(GL_LEQUAL);
-		//	skyboxTexture.activeAndBind();
-		//	skyboxShader.use();
-		//	view = mat4(mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-		//	skyboxShader.setMat4("view", view);
-		//	skyboxShader.setMat4("projection", projection);
-		//	skyBox.Draw(skyboxShader);
-		//	skyboxTexture.unactiveAndUnbind();
-		//	glDepthFunc(GL_LESS);
-		//}
+
+		/*Draw skybox*/ {
+			glDepthFunc(GL_LEQUAL);
+			skyboxTexture.activeAndBind();
+			skyboxShader.use();
+			view = mat4(mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+			skyboxShader.setMat4("view", view);
+			skyboxShader.setMat4("projection", projection);
+			skyBox.Draw(skyboxShader);
+			skyboxTexture.unactiveAndUnbind();
+			glDepthFunc(GL_LESS);
+		}
 		
+		if (useFrameBuffer) {
+			//now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.getFrameBuffer());
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFB.getFrameBuffer());
+			glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+			intermediateFB.switch2Defaultbuffer();
+			glClearColor(0.0f, 0.0f, 0, 0);
+			glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+			intermediateFB.bindColorBuffer();
+			if (enableBlur) {
+				kernel_screenShader.use();
+				kernel_screenShader.setInt("screenTexture", 0);
+				kernel_screenShader.setInt("selection", 4);
+				intermediateFB.drawFramebuffer2Defaultbuffer(kernel_screenShader);
+			}
+			else {
+				default_screenShader.use();
+				default_screenShader.setInt("screenTexture", 0);
+				intermediateFB.drawFramebuffer2Defaultbuffer(default_screenShader);
+			}
+			glActiveTexture(0);
+		}
+		window.enableMSAA(enableMSAA);
+
+
 		ImGuiHelper::drawImGui(drawGUI);
 		window.swapBuffersAndPollEvents();
 	}
@@ -154,8 +185,12 @@ void drawGUI() {
 	ImGui::Begin("ToolBox");
 
 	// =======================绘制ImGUI=========================
-	ImGui::Checkbox("MSAA", &enableMSAA);
-
+	ImGui::Checkbox("useFrameBuffer", &useFrameBuffer);
+	if (useFrameBuffer) {
+		ImGui::Checkbox("enableBlur", &enableBlur);
+	}
+	ImGui::Checkbox("enableMSAA", &enableMSAA);
+	
 	// =========================================================
 
 	/*Draw FPS*/ {
