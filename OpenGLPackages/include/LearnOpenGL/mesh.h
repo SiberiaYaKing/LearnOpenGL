@@ -1,10 +1,13 @@
 #pragma once
+#include <map>
+#include <functional>
 #include <vector>
 #include <string>
 #include <LearnOpenGL/shader.h>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
+
 
 //这个类可能存在的问题：着色器纹理不能动态绑定
 
@@ -33,13 +36,19 @@ public:
 
 	Mesh(std::vector<Vertex>, std::vector<unsigned int>, std::vector<Texture>);
 
-	void Draw(Shader shader);
+	inline unsigned int getVAO() const { return VAO; }
+
+	void Draw(Shader shader , const std::string& shaderType ="Default");
 	void drawPoint(Shader shader);
+	void drawInstance(Shader shader, GLsizei count, const std::string& shaderType="Default");
 private:
 	//渲染数据
 	unsigned int VAO, VBO, EBO;
 
 	void setupMesh();
+
+	void setupDefaultShader(Shader& shader);
+	void setupPBRShader(Shader& shader);
 
 private:
 	class MeshGC {
@@ -60,6 +69,13 @@ private:
 		}
 	};
 
+	std::map<std::string, std::function<void(Shader&)> > setupShaderFuncMap;
+	inline void setupFunMap() {
+		setupShaderFuncMap = {
+		{"Default", std::bind(&Mesh::setupDefaultShader,*this,std::placeholders::_1)},
+		{"PBR", std::bind(&Mesh::setupPBRShader,*this,std::placeholders::_1)},
+		};
+	}
 };
 
 //------------------------------------------------------------------
@@ -69,6 +85,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	this->indices = indices;
 	this->textures = textures;
 	setupMesh();
+	setupFunMap();
 }
 
 void Mesh::setupMesh() {
@@ -96,29 +113,8 @@ void Mesh::setupMesh() {
 	gc.add_id(VAO, VBO, EBO);
 }
 
-void Mesh::Draw(Shader shader) {
-	unsigned int diffuseNr = 1;
-	unsigned int specularNr = 1;
-	shader.use();
-	//是否有贴图
-	if (textures.size()) {
-		shader.setBool("has_texture", true);
-		for (unsigned int i = 0; i < textures.size(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			std::string number;
-			std::string name = textures[i].type;
-			if (name == "texture_diffuse")
-				number = std::to_string(diffuseNr++);
-			else if (name == "texture_specular") 
-				number = std::to_string(specularNr++);
-			shader.setInt( name + number, i);
-			glBindTexture(GL_TEXTURE_2D, textures[i].id);
-		}
-	}
-	else  shader.setBool("has_texture", false);
-
-	float shininess = 0.25f;
-	shader.setFloat("shininess", shininess*128.0f);
+void Mesh::Draw(Shader shader,const std::string& shaderType) {
+	setupShaderFuncMap[shaderType](shader);
 
 	//绘制网格
 	glBindVertexArray(VAO);
@@ -135,5 +131,46 @@ void Mesh::drawPoint(Shader shader) {
 	glBindVertexArray(VAO);
 	glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0); //解绑
+}
+
+void Mesh::drawInstance(Shader shader, GLsizei count, const std::string& shaderType) {
+	setupShaderFuncMap[shaderType](shader);
+	//绘制网格
+	glBindVertexArray(VAO);
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0,count);
+	glBindVertexArray(0); //解绑
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//解绑贴图
+	glActiveTexture(0);
+}
+
+void Mesh::setupDefaultShader(Shader& shader) {
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
+	shader.use();
+	//是否有贴图
+	if (textures.size()) {
+		shader.setBool("has_texture", true);
+		for (unsigned int i = 0; i < textures.size(); i++) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			std::string number;
+			std::string name = textures[i].type;
+			if (name == "texture_diffuse")
+				number = std::to_string(diffuseNr++);
+			else if (name == "texture_specular")
+				number = std::to_string(specularNr++);
+			shader.setInt(name + number, i);
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		}
+	}
+	else  shader.setBool("has_texture", false);
+
+	float shininess = 0.25f;
+	shader.setFloat("shininess", shininess * 128.0f);
+}
+
+void Mesh::setupPBRShader(Shader& shader) {
+	//TODO: for support pbr
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

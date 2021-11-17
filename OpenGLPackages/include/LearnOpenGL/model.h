@@ -29,7 +29,10 @@ public:
 	Model(const std::string &path) {
 		loadModel(path);
 	}
-	void Draw(Shader shader);
+	void Draw(Shader shader, const std::string& shaderType = "Default");
+	void drawInstance(Shader shader, GLsizei count, const std::string& shaderType = "Default");
+	inline void getMeshes(std::vector<Mesh>& outMeshes) const { outMeshes = meshes; }
+
 private:
 	//模型数据
 	std::vector<Mesh> meshes;
@@ -44,10 +47,17 @@ private:
 
 //---------------------------------------------------------------
 
-void Model::Draw(Shader shader) {
+void Model::Draw(Shader shader, const std::string& shaderType) {
 	for (unsigned i = 0; i < meshes.size(); i++)
-		meshes[i].Draw(shader);
+		meshes[i].Draw(shader,shaderType);
 }
+
+
+void Model::drawInstance(Shader shader, GLsizei count, const std::string& shaderType) {
+	for (unsigned i = 0; i < meshes.size(); i++)
+		meshes[i].drawInstance(shader, count, shaderType);
+}
+
 
 void Model::loadModel(const std::string &path) {
 	Assimp::Importer importer;
