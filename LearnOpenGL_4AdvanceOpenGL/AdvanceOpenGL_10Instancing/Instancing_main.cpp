@@ -6,18 +6,29 @@ using namespace glm;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 560;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 5.0f), {0,1,0}, YAW, -10.0);
 const string deferredShaderDir = dir_shaders + ("AdvanceLighting/DeferredShading/");
 const string localShaderDir = dir_shaders + ("AdvanceOpenGL/Instancing/");
 
 int selection = 0;
-bool useInstancing = false;
+int level = 8;
+int oldLevel = 0;
+bool useInstancing = true;
 
 void drawGUI();
+void updateLevel(vector<mat4>& modelMatrices,const Model& nanosuit);
+
+struct DirectionLight
+{
+	vec3 lightDir = { -0.2f, -1.0f, -0.3f };
+	vec3 dla = { 0, 0, 0 };
+	vec3 dld = { 0.3, 0.3, 0.3 };
+	vec3 dls = { 0.5f, 0.5f, 0.5f};
+};
 
 int main() {
 	OpenGLWindow window; {
-		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceLighting_DeferredShading", 4); }
+		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceOpenGL_Instancing", 4); }
 		catch (OpenGLWindowException e) {
 			cout << e.what() << endl;
 			return -1;
@@ -89,54 +100,8 @@ int main() {
 	//perpare model
 	Model nanosuit(dir_models + "nanosuit/nanosuit.obj");
 
-	//postionOffset
-	vector<glm::vec3> objectPositions;
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, 3.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
-
-	//generate list of modelMatrices
-	vector<glm::mat4> modelMatrices;
-	for (GLuint i = 0; i < objectPositions.size(); i++)
-	{
-		glm::mat4 model = glm::mat4();
-		model = glm::translate(model, objectPositions[i]);
-		model = glm::scale(model, glm::vec3(0.25f));
-		modelMatrices.push_back(model);
-	}
-	// setup modelMatrices
-	unsigned int modelMatricesBuffer;
-	glGenBuffers(1, &modelMatricesBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
-	glBufferData(GL_ARRAY_BUFFER, modelMatrices.size() * sizeof(mat4), modelMatrices.data(), GL_STATIC_DRAW);
-	// setup VAO , add modelmatrix pointer
-	vector<Mesh> nanosuitMeshes;
-	nanosuit.getMeshes(nanosuitMeshes);
-	for (int i = 0; i < nanosuitMeshes.size(); i++) {
-		unsigned int tempVAO = nanosuitMeshes[i].getVAO();
-		glBindVertexArray(tempVAO);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
-
-		glVertexAttribDivisor(3, 1);
-		glVertexAttribDivisor(4, 1);
-		glVertexAttribDivisor(5, 1);
-		glVertexAttribDivisor(6, 1);
-
-		glBindVertexArray(0);
-	}
+	vector<mat4> modelMatrices;
+	updateLevel(modelMatrices,nanosuit);
 
 	Shader lampShader(dir_shaders + "lampShader.vs", dir_shaders + "lampShader.fs");
 	CubeData cubedata;
@@ -151,13 +116,13 @@ int main() {
 	{
 		// Calculate slightly random offsets
 		GLfloat xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-		GLfloat yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
+		GLfloat yPos = ((rand() % 100) / 100.0) * 5.0 - 4.0;
 		GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
 		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 		// Also calculate random color
-		GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-		GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-		GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+		GLfloat rColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.5 and 1.0
+		GLfloat gColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.5 and 1.0
+		GLfloat bColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.5 and 1.0
 		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 	}
 
@@ -167,6 +132,8 @@ int main() {
 	showGBufferShader.setInt("positionTex", 0);
 	showGBufferShader.setInt("normalTex", 1);
 	showGBufferShader.setInt("albedoSpecTex", 2);
+
+	DirectionLight dirLight;
 	// ============================================================
 
 	/* ==============Set up skybox=============== */
@@ -192,7 +159,7 @@ int main() {
 		mat4 view = camera.GetViewMatrix();
 
 		// =========================绘制其他渲染对象=====================
-
+		updateLevel(modelMatrices, nanosuit);
 		/*Gbuffer pass*/
 		gBuffer.switch2Framebuffer();
 		glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -221,6 +188,10 @@ int main() {
 		gBuffer.bindColorBuffer();
 		showGBufferShader.use();
 		showGBufferShader.setInt("selection", selection);
+		showGBufferShader.setVec3("dirLight.direction", dirLight.lightDir);
+		showGBufferShader.setVec3("dirLight.diffuse", dirLight.dld);
+		showGBufferShader.setVec3("dirLight.ambient", dirLight.dla);
+		showGBufferShader.setVec3("dirLight.specular", dirLight.dls);
 		if (selection == 0) {
 			for (GLuint i = 0; i < NR_LIGHTS; i++) {
 				showGBufferShader.setVec3("lights[" + to_string(i) + "].Position", lightPositions[i]);
@@ -271,13 +242,64 @@ int main() {
 			skyboxTexture.unactiveAndUnbind();
 			glDepthFunc(GL_LESS);
 		}
-
+		
 		ImGuiHelper::drawImGui(drawGUI);
 		window.swapBuffersAndPollEvents();
 	}
 	return 0;
 }
 
+void updateLevel(vector<mat4>& modelMatrices,const Model& nanosuit) {
+	if (oldLevel != level) {
+		oldLevel = level;
+		//postionOffset
+		int step = 3;
+		int size = level * 2 - 1;
+		vec3 originPos = vec3(-3.0*(size/2), -3.0, -3.0 *(size/2));
+		vector<glm::vec3> objectPositions;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				objectPositions.push_back(originPos + vec3(step*i, 0, step*j));
+			}
+		}
+		modelMatrices.clear();
+		//generate list of modelMatrices
+		for (GLuint i = 0; i < objectPositions.size(); i++)
+		{
+			glm::mat4 model = glm::mat4();
+			model = glm::translate(model, objectPositions[i]);
+			model = glm::scale(model, glm::vec3(0.25f));
+			modelMatrices.push_back(model);
+		}
+		// setup modelMatrices
+		unsigned int modelMatricesBuffer;
+		glGenBuffers(1, &modelMatricesBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
+		glBufferData(GL_ARRAY_BUFFER, modelMatrices.size() * sizeof(mat4), modelMatrices.data(), GL_STATIC_DRAW);
+		// setup VAO , add modelmatrix pointer
+		vector<Mesh> nanosuitMeshes;
+		nanosuit.getMeshes(nanosuitMeshes);
+		for (int i = 0; i < nanosuitMeshes.size(); i++) {
+			unsigned int tempVAO = nanosuitMeshes[i].getVAO();
+			glBindVertexArray(tempVAO);
+			glEnableVertexAttribArray(3);
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+			glEnableVertexAttribArray(5);
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+			glEnableVertexAttribArray(6);
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+			glVertexAttribDivisor(3, 1);
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+
+			glBindVertexArray(0);
+		}
+	}
+}
 
 void drawGUI() {
 	ImGui::Begin("ToolBox");
@@ -293,6 +315,8 @@ void drawGUI() {
 		ImGui::TreePop();
 	}
 	ImGui::Checkbox("UseInstancing", &useInstancing);
+	ImGui::InputInt("Level", &level);
+	if (level > 15) { level = 15; }
 	// =========================================================
 
 	/*Draw FPS*/ {

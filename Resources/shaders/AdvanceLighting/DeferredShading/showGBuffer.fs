@@ -23,6 +23,15 @@ const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
+struct DirLight{
+    vec3 direction;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+uniform DirLight dirLight;
+
 void main(){
 	switch(selection){
         case 0:
@@ -33,6 +42,17 @@ void main(){
             // 计算光照
             vec3 lighting = albedoSpec.rgb*0.1; // 硬编码环境光分量
             vec3 viewDir = normalize(viewPos-fragPos);
+
+            //dir Light
+            vec3 lightDir = normalize(-dirLight.direction);
+            float diff = max(dot(lightDir,normal),0);
+            vec3 reflectDir = reflect(-lightDir,normal);
+            float spec = pow(max(dot(reflectDir,viewDir),0.0),16.0);
+            vec3 diffuse = dirLight.diffuse.rgb*diff*albedoSpec.rgb;
+            vec3 specular = dirLight.specular.rgb*spec*albedoSpec.a;
+            lighting += diffuse+specular;
+
+            // point Light
             for(int i=0;i<NR_LIGHTS; i++){
                 // 光体积制约
                 float distance = length(lights[i].Position-fragPos);
