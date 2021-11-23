@@ -31,6 +31,14 @@ struct DirLight{
     vec3 specular;
 };
 uniform DirLight dirLight;
+uniform bool gammaCorrect = false;
+uniform int lightingMode = 0;
+
+const float gamma = 2.2f;
+const float invGamma = 0.454546f; // 1.0/gamma
+vec4 DecodeGamma(vec4 src){
+    return pow(src,vec4(invGamma));
+}
 
 void main(){
 	switch(selection){
@@ -46,8 +54,15 @@ void main(){
             //dir Light
             vec3 lightDir = normalize(-dirLight.direction);
             float diff = max(dot(lightDir,normal),0);
-            vec3 reflectDir = reflect(-lightDir,normal);
-            float spec = pow(max(dot(reflectDir,viewDir),0.0),16.0);
+            float spec = 0;
+            if(lightingMode == 0){ //Phong
+                vec3 reflectDir = reflect(-lightDir,normal);
+                spec = pow(max(dot(reflectDir,viewDir),0.0),16.0);
+            }
+            else if(lightingMode == 1){ //Blinn
+                vec3 halfDir = normalize(lightDir+viewDir);
+                spec = pow (max(dot(normal,halfDir),0.0),16.0);
+            }
             vec3 diffuse = dirLight.diffuse.rgb*diff*albedoSpec.rgb;
             vec3 specular = dirLight.specular.rgb*spec*albedoSpec.a;
             lighting += diffuse+specular;
@@ -61,8 +76,15 @@ void main(){
                     vec3 lightDir = normalize(lights[i].Position-fragPos);
                     vec3 diffuse = max(dot(normal,lightDir),0.0)*albedoSpec.rgb*lights[i].Color;
                     //高光
-                    vec3 halfDir = normalize(lightDir+viewDir);
-                    float spec = pow (max(dot(normal,halfDir),0.0),16.0);
+                    float spec = 0;
+                    if(lightingMode == 0){ //Phong
+                        vec3 reflectDir = reflect(-lightDir,normal);
+                        spec = pow(max(dot(reflectDir,viewDir),0.0),16.0);
+                    }
+                    else if(lightingMode == 1){ //Blinn
+                        vec3 halfDir = normalize(lightDir+viewDir);
+                        spec = pow (max(dot(normal,halfDir),0.0),16.0);
+                    }
                     vec3 specular = lights[i].Color*spec*albedoSpec.a;
                     //衰减
                     float lightDis = length(lights[i].Position - fragPos);
@@ -89,5 +111,7 @@ void main(){
             FragColor = vec4(specularColor,specularColor,specularColor,1.0);
             break;
     }
-	
+	if(gammaCorrect){
+        FragColor = DecodeGamma(FragColor);
+    }
 }

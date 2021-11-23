@@ -10,12 +10,14 @@ Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
 const string localShaderDir = dir_shaders + ("AdvanceLighting/DeferredShading/");
 
 int selection = 0;
+bool gammaCorrect = true;
+int lightingMode = 0;
 
 void drawGUI();
 
 int main() {
 	OpenGLWindow window; {
-		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceLighting_DeferredShading",4); }
+		try { window.initWindow(SCR_WIDTH, SCR_HEIGHT, "AdvanceLighting_DeferredShading&Blinn&Gamma",4); }
 		catch (OpenGLWindowException e) {
 			cout << e.what() << endl;
 			return -1;
@@ -174,6 +176,8 @@ int main() {
 		gBuffer.bindColorBuffer();
 		showGBufferShader.use();
 		showGBufferShader.setInt("selection", selection);
+		showGBufferShader.setBool("gammaCorrect", gammaCorrect);
+		showGBufferShader.setInt("lightingMode", lightingMode);
 		if(selection==0) {
 			for (GLuint i = 0; i < NR_LIGHTS; i++) {
 				showGBufferShader.setVec3("lights[" + to_string(i) + "].Position", lightPositions[i]);
@@ -245,6 +249,16 @@ void drawGUI() {
 		}
 		ImGui::TreePop();
 	}
+	static const char* lightingModeNames[2] = { "Phong","Blinn" };
+	if (ImGui::TreeNode("LightingMode")) {
+		for (int n = 0; n < _countof(lightingModeNames); n++) {
+			if (ImGui::Selectable(lightingModeNames[n], lightingMode == n)) {
+				lightingMode = n;
+			}
+		}
+		ImGui::TreePop();
+	}
+	ImGui::Checkbox("GammaCorrect", &gammaCorrect);
 	// =========================================================
 
 	/*Draw FPS*/ {

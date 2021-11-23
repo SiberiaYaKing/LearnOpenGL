@@ -22,8 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{f6ff9bb7-50c8-41ea-9e4b-45de150a887a}</ProjectGuid>
-    <RootNamespace>AdvanceLighting8DeferredShading</RootNamespace>
+    <RootNamespace>AdvanceLighting_8DeferredShading,Blinn,Gamma</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>AdvanceLighting_8DeferredShading,1Blinn,2Gamma</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

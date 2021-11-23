@@ -14,6 +14,7 @@ int selection = 0;
 int level = 8;
 int oldLevel = 0;
 bool useInstancing = true;
+bool gammaCorrect = true;
 
 void drawGUI();
 void updateLevel(vector<mat4>& modelMatrices,const Model& nanosuit);
@@ -101,7 +102,6 @@ int main() {
 	Model nanosuit(dir_models + "nanosuit/nanosuit.obj");
 
 	vector<mat4> modelMatrices;
-	updateLevel(modelMatrices,nanosuit);
 
 	Shader lampShader(dir_shaders + "lampShader.vs", dir_shaders + "lampShader.fs");
 	CubeData cubedata;
@@ -120,9 +120,9 @@ int main() {
 		GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
 		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 		// Also calculate random color
-		GLfloat rColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.5 and 1.0
-		GLfloat gColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.5 and 1.0
-		GLfloat bColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.5 and 1.0
+		GLfloat rColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.8 and 1.0
+		GLfloat gColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.8 and 1.0
+		GLfloat bColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.8 and 1.0
 		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 	}
 
@@ -192,6 +192,7 @@ int main() {
 		showGBufferShader.setVec3("dirLight.diffuse", dirLight.dld);
 		showGBufferShader.setVec3("dirLight.ambient", dirLight.dla);
 		showGBufferShader.setVec3("dirLight.specular", dirLight.dls);
+		showGBufferShader.setBool("gammaCorrect", gammaCorrect);
 		if (selection == 0) {
 			for (GLuint i = 0; i < NR_LIGHTS; i++) {
 				showGBufferShader.setVec3("lights[" + to_string(i) + "].Position", lightPositions[i]);
@@ -315,6 +316,7 @@ void drawGUI() {
 		ImGui::TreePop();
 	}
 	ImGui::Checkbox("UseInstancing", &useInstancing);
+	ImGui::Checkbox("GammaCorrect", &gammaCorrect);
 	ImGui::InputInt("Level", &level);
 	if (level > 15) { level = 15; }
 	// =========================================================
