@@ -50,7 +50,7 @@ class Shader
 public:
 	// 程序ID
 	unsigned int ID;
-
+	Shader() {}
 	// 构造器读取并构建着色器
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	Shader(const std::string& vertexPath, const std::string& fragmentPath);

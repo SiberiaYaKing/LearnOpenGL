@@ -11,12 +11,6 @@
 #include <LearnOpenGL/mesh.h>
 #include <LearnOpenGL/texture_loader.h>
 
-//这个类可能存在的问题：可能不支持默认没有纹理的模型
-
-
-
-
-
 //+++++++++++++++++++++++++++ Model ++++++++++++++++++++++++++++++++++++++++
 
 class Model {
@@ -29,8 +23,8 @@ public:
 	Model(const std::string &path) {
 		loadModel(path);
 	}
-	void Draw(Shader shader, const std::string& shaderType = "Default");
-	void drawInstance(Shader shader, GLsizei count, const std::string& shaderType = "Default");
+	void Draw(Shader shader, const std::string& shaderType = SHADER_DEFAULT);
+	void drawInstance(Shader shader, GLsizei count, const std::string& shaderType = SHADER_DEFAULT);
 	inline void getMeshes(std::vector<Mesh>& outMeshes) const { outMeshes = meshes; }
 
 private:
@@ -47,6 +41,7 @@ private:
 
 //---------------------------------------------------------------
 
+
 void Model::Draw(Shader shader, const std::string& shaderType) {
 	for (unsigned i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader,shaderType);
@@ -57,7 +52,6 @@ void Model::drawInstance(Shader shader, GLsizei count, const std::string& shader
 	for (unsigned i = 0; i < meshes.size(); i++)
 		meshes[i].drawInstance(shader, count, shaderType);
 }
-
 
 void Model::loadModel(const std::string &path) {
 	Assimp::Importer importer;
@@ -110,10 +104,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];  //获取所有材质
 		//获取漫反射材质贴图
-		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TEXTURE_DIFFUSE);
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		//获取高光材质贴图
-		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TEXTURE_SPECULAR);
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 	return Mesh(vertices, indices, textures);

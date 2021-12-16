@@ -85,7 +85,7 @@ int main() {
 	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 	// ========================…Ë÷√‰÷»æ∂‘œÛ=========================
-	Framebuffer framebuffer(SCR_WIDTH, SCR_HEIGHT,1,true,4);
+	MSAAFrameBuffer framebuffer(SCR_WIDTH, SCR_HEIGHT, 1,4);
 	Framebuffer intermediateFB(SCR_WIDTH, SCR_HEIGHT,1);
 
 	CubeData boxData;

@@ -67,3 +67,6 @@
 
 #### 13.项目模板和配置文件
 * 放在OpenGLPackage里面，分别是LearnOpenGL_ProjectTemplete.zip 和 opengl_vs2017_project.props
+
+#### 14.如何对vs2019添加项目模板
+* C:/User/xxx/Documents/Visual Studio 2019/Templates/ProjectTemplates 中添加自己的项目模板zip文件即可

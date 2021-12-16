@@ -34,6 +34,7 @@ class OpenGLWindow {
 private:
 	GLFWwindow *window = nullptr;
 	void(*inputProcessor)(const OpenGLWindow& ) = nullptr;
+	//unsigned int height, width;
 public:
 	void initWindow(unsigned int width,unsigned int height,const std::string &name, int samplerCount=1);
 	void setCursorDisable() const;
@@ -69,6 +70,16 @@ public:
 		}
 		
 	}
+	inline void enableGamma(bool isOn) {
+		if (isOn) glEnable(GL_FRAMEBUFFER_SRGB);
+		else glDisable(GL_FRAMEBUFFER_SRGB);
+	}
+	//inline unsigned int getHeight() const {
+	//	return height;
+	//}
+	//inline unsigned int getWidth() const {
+	//	return width;
+	//}
 public:
 	static float deltaTime;
 	static float calculateDeltaTime() {
@@ -119,6 +130,8 @@ void OpenGLWindow::initWindow(unsigned int width, unsigned int height, const std
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw InitGLADException();
 	}
+	//this->width = width;
+	//this->height = height;
 	lastX = (float)width / 2;
 	lastY = (float)height / 2;
 	enableMSAA(false); // Ä¬ÈÏ²»¿ªÆôMSAA

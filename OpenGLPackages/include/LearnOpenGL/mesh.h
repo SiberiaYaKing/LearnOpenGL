@@ -3,13 +3,21 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include <memory>
 #include <LearnOpenGL/shader.h>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
+#include <LearnOpenGL/framebuffer.h>
 
 
 //这个类可能存在的问题：着色器纹理不能动态绑定
+
+const std::string TEXTURE_DIFFUSE = "texture_diffuse";
+const std::string TEXTURE_SPECULAR = "texture_specular";
+
+const std::string SHADER_DEFAULT = "Default";
+const std::string SHADER_PBR = "PBR";
 
 struct Vertex {
 	glm::vec3 Position;
@@ -26,7 +34,6 @@ struct Texture {
 };
 
 
-
 class Mesh {
 public:
 	//网格数据
@@ -34,13 +41,13 @@ public:
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
 
-	Mesh(std::vector<Vertex>, std::vector<unsigned int>, std::vector<Texture>);
+	Mesh(const std::vector<Vertex>&, const std::vector<unsigned int>&,const std::vector<Texture>&);
 
 	inline unsigned int getVAO() const { return VAO; }
-
-	void Draw(Shader shader , const std::string& shaderType ="Default");
+	
+	void Draw(Shader shader , const std::string& shaderType =SHADER_DEFAULT);
 	void drawPoint(Shader shader);
-	void drawInstance(Shader shader, GLsizei count, const std::string& shaderType="Default");
+	void drawInstance(Shader shader, GLsizei count, const std::string& shaderType=SHADER_DEFAULT);
 private:
 	//渲染数据
 	unsigned int VAO, VBO, EBO;
@@ -72,15 +79,15 @@ private:
 	std::map<std::string, std::function<void(Shader&)> > setupShaderFuncMap;
 	inline void setupFunMap() {
 		setupShaderFuncMap = {
-		{"Default", std::bind(&Mesh::setupDefaultShader,*this,std::placeholders::_1)},
-		{"PBR", std::bind(&Mesh::setupPBRShader,*this,std::placeholders::_1)},
+		{SHADER_DEFAULT, std::bind(&Mesh::setupDefaultShader,*this,std::placeholders::_1)},
+		{SHADER_PBR, std::bind(&Mesh::setupPBRShader,*this,std::placeholders::_1)},
 		};
 	}
 };
 
 //------------------------------------------------------------------
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures) {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
@@ -156,9 +163,9 @@ void Mesh::setupDefaultShader(Shader& shader) {
 			glActiveTexture(GL_TEXTURE0 + i);
 			std::string number;
 			std::string name = textures[i].type;
-			if (name == "texture_diffuse")
+			if (name == TEXTURE_DIFFUSE)
 				number = std::to_string(diffuseNr++);
-			else if (name == "texture_specular")
+			else if (name == TEXTURE_SPECULAR)
 				number = std::to_string(specularNr++);
 			shader.setInt(name + number, i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
