@@ -81,7 +81,7 @@ int main() {
 			camera.ProcessMouseScroll(yoff);
 		});
 	}
-	window.enableGamma(true);
+	//window.enableGamma(true);
 	glEnable(GL_CULL_FACE);
 	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 	// ========================…Ë÷√‰÷»æ∂‘œÛ=========================

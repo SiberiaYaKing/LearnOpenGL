@@ -68,6 +68,12 @@ vec3 CalcDirLight(DirLight light,vec3 normal,vec3 viewDir);
 vec3 CalcPointLight(PointLight light,vec3 normal,vec3 fragPos,vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light,vec3 normal,vec3 fragPos,vec3 viewDir);
 
+const float gamma = 2.2f;
+const float invGamma = 0.454546f; // 1.0/gamma
+vec4 DecodeGamma(vec4 src){
+    return pow(src,vec4(invGamma));
+}
+
 void main(){
 	//Mix ALL Light
 	vec3 viewDir = normalize(viewPos-fs_in.FragPos);
@@ -78,7 +84,7 @@ void main(){
 		result += CalcPointLight(pointLights[i],norm,fs_in.FragPos,viewDir);
 	result += CalcSpotLight(spotLight,norm,fs_in.FragPos,viewDir);
 	
-	FragColor = vec4(result,1.0);
+	FragColor = DecodeGamma(vec4(result,1.0));
 }
 
 float CalcShadow(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal){
@@ -101,6 +107,7 @@ float CalcShadow(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal){
 		}    
 	}
 	inLight /= 9.0;
+
 	// // no pcf
 	// float closestDepth = texture(shadowMap,projCoords.xy).r;
 	// float inLight = step(currentDepth+bias,closestDepth);
