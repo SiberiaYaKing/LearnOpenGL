@@ -133,7 +133,7 @@ int main() {
 	// ############# ShadowMap prepare ##########
 	ShadowMapFrameBuffer shadowFB(SHADOW_WIDTH, SHADOW_HEIGHT);
 	Shader shadowMapShader(shaderDir +"simpleDepthShader.vs", shaderDir +"simpleDepthShader.fs");
-
+	Shader showShadowMapShader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", shaderDir + "showShadowMap.fs");
 	// ============================================================
 
 	/* ==============Set up skybox=============== */ 
@@ -177,7 +177,7 @@ int main() {
 		if (debugShadowMap && useShadowMap) {
 			glViewport(0, 0, SHADOW_WIDTH / 2, SHADOW_HEIGHT / 2);
 			window.resetSize(SHADOW_WIDTH/2, SHADOW_HEIGHT/2);
-			shadowFB.drawForShowShadowMap(); //for shadowMap debug
+			shadowFB.drawForShowShadowMap(showShadowMapShader); //for shadowMap debug
 		}
 		else if (!debugShadowMap||(debugShadowMap&&!useShadowMap)) {
 			glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);

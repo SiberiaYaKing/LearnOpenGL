@@ -224,8 +224,7 @@ private:
 class ShadowMapFrameBuffer :public Framebuffer {
 public:
 
-	ShadowMapFrameBuffer(unsigned int bufferWidth, unsigned int bufferHeight)
-		:showShadowMapShader(Shader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/showShadowMap.fs")){
+	ShadowMapFrameBuffer(unsigned int bufferWidth, unsigned int bufferHeight){
 		glGenFramebuffers(1, &framebuffer);
 
 		glGenTextures(1, &depthMapBuffer);
@@ -250,7 +249,7 @@ public:
 	inline GLuint getDepthMapBuffer() const {
 		return depthMapBuffer;
 	}
-	void drawForShowShadowMap() {
+	void drawForShowShadowMap(Shader showShadowMapShader) {
 		showShadowMapShader.use();
 		showShadowMapShader.setInt("depthMap",0);
 		glBindVertexArray(screenVAO);
@@ -261,5 +260,4 @@ public:
 
 private:
 	GLuint depthMapBuffer;
-	Shader showShadowMapShader; 
 };
