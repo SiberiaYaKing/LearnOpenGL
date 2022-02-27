@@ -12,7 +12,7 @@ Camera camera(glm::vec3(0.0f, 0.1f, 5.0f));
 
 void drawGUI();
 
-const string shaderDir = dir_shaders + "AdvanceLighting/ShadowMapping&NormalMapping/";
+const string shaderDir = dir_shaders + "AdvanceLighting/ShadowMapping/";
 
 struct DirectionLight
 {
@@ -158,7 +158,7 @@ int main() {
 		// =========================绘制其他渲染对象=====================
 		float lightRotateOffsetYRadians = glm::radians(lightRotateOffsetY);
 		light.lightSpaceMat = glm::rotate(originLightSpaceMat, lightRotateOffsetYRadians, glm::vec3(0, 1, 0));
-		light.lightDir = glm::rotate(mat4{}, lightRotateOffsetYRadians, glm::vec3(0, 1, 0))*originLightDir;
+		light.lightDir = glm::rotate(mat4{}, lightRotateOffsetYRadians, glm::vec3(0, -1, 0))*originLightDir;
 		shadowMapShader.use();
 		shadowMapShader.setMat4("lightSpaceMatrix", light.lightSpaceMat);
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
