@@ -12,18 +12,31 @@ Camera camera(glm::vec3(0.0f, 0.1f, 5.0f));
 
 void drawGUI();
 
-const string shadowMapShaderDir = dir_shaders + "AdvanceLighting/ShadowMapping/";
+const string shaderDir = dir_shaders + "AdvanceLighting/ShadowMapping&NormalMapping/";
 
 struct DirectionLight
 {
+	DirectionLight() {
+		GLfloat near_plane = 1.0f, far_plane = 20.0f;
+		glm::vec3 lightPos(4, 4, 4.8);
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		lightSpaceMat = lightProjection * lightView;
+	}
 	bool isDirLight = true;
 	vec3 lightDir = { -0.5f, -0.5f, -0.6f };
 	vec3 dla = { 0.4, 0.4, 0.4 };
 	vec3 dld = { 0.7, 0.7, 0.7, };
 	vec3 dls = { 0.9f, 0.9f, 0.9f,};
+	mat4 lightSpaceMat;
 };
 
 void RenderScene(vector<glm::vec3>& objectPositions, Model& nanosuit, Mesh& groundMesh, Shader& shader);
+
+bool debugShadowMap = false;
+bool useShadowMap = true;
+bool useNormalMap = true;
+float lightRotateOffsetY = 0;
 
 int main() {
 	OpenGLWindow window; {
@@ -113,19 +126,13 @@ int main() {
 	groundQuadData.textures.push_back({ specularTexLoader.getTextureID(),TEXTURE_SPECULAR,specularTexPath });
 	Mesh groundMesh(groundQuadData.vertices, groundQuadData.indices, groundQuadData.textures);
 	
-	Shader phongShader(shadowMapShaderDir + "StandardPhongWithShadowMap.vs", shadowMapShaderDir + "StandardPhongWithShadowMap.fs");
+	Shader phongShader(shaderDir + "StandardPhong.vs", shaderDir + "StandardPhong.fs");
 	DirectionLight light;
-
+	glm::mat4 originLightSpaceMat = light.lightSpaceMat;
+	glm::vec4 originLightDir = vec4(light.lightDir,0);
 	// ############# ShadowMap prepare ##########
 	ShadowMapFrameBuffer shadowFB(SHADOW_WIDTH, SHADOW_HEIGHT);
-
-	GLfloat near_plane = 1.0f, far_plane = 20.0f;
-	glm::vec3 lightPos(4, 4, 4.8);
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 lightSpaceMat = lightProjection * lightView;
-
-	Shader shadowMapShader(shadowMapShaderDir+"simpleDepthShader.vs",shadowMapShaderDir+"simpleDepthShader.fs");
+	Shader shadowMapShader(shaderDir +"simpleDepthShader.vs", shaderDir +"simpleDepthShader.fs");
 
 	// ============================================================
 
@@ -149,36 +156,49 @@ int main() {
 		mat4 view = camera.GetViewMatrix();
 
 		// =========================绘制其他渲染对象=====================
+		float lightRotateOffsetYRadians = glm::radians(lightRotateOffsetY);
+		light.lightSpaceMat = glm::rotate(originLightSpaceMat, lightRotateOffsetYRadians, glm::vec3(0, 1, 0));
+		light.lightDir = glm::rotate(mat4{}, lightRotateOffsetYRadians, glm::vec3(0, 1, 0))*originLightDir;
 		shadowMapShader.use();
-		shadowMapShader.setMat4("lightSpaceMatrix", lightSpaceMat);
+		shadowMapShader.setMat4("lightSpaceMatrix", light.lightSpaceMat);
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		shadowFB.switch2Framebuffer();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		
-		RenderScene(objectPositions, nanosuit, groundMesh, shadowMapShader);
+		if (useShadowMap) {
+			RenderScene(objectPositions, nanosuit, groundMesh, shadowMapShader);
+		} else {
+			debugShadowMap = false;
+			shadowFB.clearDepth();
+		}
 		shadowFB.switch2Defaultbuffer();
+		
 
-		int wndWidth, wndHeight;
-		window.getWindowSize(&wndWidth, &wndHeight);
-		glViewport(0, 0, wndWidth, wndHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//shadowFB.drawForShowShadowMap(); //for shadowMap debug
-		phongShader.use();
-		phongShader.setBool("dirLight.isOn", light.isDirLight);
-		phongShader.setVec3("dirLight.diffuse", light.dld);
-		phongShader.setVec3("dirLight.ambient", light.dla);
-		phongShader.setVec3("dirLight.specular", light.dls);
-		phongShader.setVec3("dirLight.direction", light.lightDir);
-		phongShader.setVec3("viewPos", camera.Position);
-		phongShader.setMat4("view", view);
-		phongShader.setMat4("projection", projection);
-		// setup ShadowMap texture
-		phongShader.setMat4("lightSpaceMatrix", lightSpaceMat);
-		glActiveTexture(GL_TEXTURE0 + groundMesh.textures.size());
-		phongShader.setInt("shadowMap", groundMesh.textures.size());
-		glBindTexture(GL_TEXTURE_2D, shadowFB.getDepthMapBuffer());
+		if (debugShadowMap && useShadowMap) {
+			glViewport(0, 0, SHADOW_WIDTH / 2, SHADOW_HEIGHT / 2);
+			window.resetSize(SHADOW_WIDTH/2, SHADOW_HEIGHT/2);
+			shadowFB.drawForShowShadowMap(); //for shadowMap debug
+		}
+		else if (!debugShadowMap||(debugShadowMap&&!useShadowMap)) {
+			glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+			window.resetSize(SCR_WIDTH, SCR_HEIGHT);
+			phongShader.use();
+			phongShader.setBool("dirLight.isOn", light.isDirLight);
+			phongShader.setVec3("dirLight.diffuse", light.dld);
+			phongShader.setVec3("dirLight.ambient", light.dla);
+			phongShader.setVec3("dirLight.specular", light.dls);
+			phongShader.setVec3("dirLight.direction", light.lightDir);
+			phongShader.setVec3("viewPos", camera.Position);
+			phongShader.setMat4("view", view);
+			phongShader.setMat4("projection", projection);
+			// setup ShadowMap texture
+			phongShader.setMat4("lightSpaceMatrix", light.lightSpaceMat);
+			glActiveTexture(GL_TEXTURE0 + groundMesh.textures.size());
+			phongShader.setInt("shadowMap", groundMesh.textures.size());
+			glBindTexture(GL_TEXTURE_2D, shadowFB.getDepthMapBuffer());
 
-		RenderScene(objectPositions, nanosuit, groundMesh, phongShader);
+			RenderScene(objectPositions, nanosuit, groundMesh, phongShader);
+		}
 
 		// =============================================================
 
@@ -203,8 +223,7 @@ int main() {
 	return 0;
 }
 
-void RenderScene(vector<glm::vec3>& objectPositions, 
-	Model& nanosuit, Mesh& groundMesh, Shader& shader) {
+void RenderScene(vector<glm::vec3>& objectPositions, Model& nanosuit, Mesh& groundMesh, Shader& shader) {
 	for (int i = 0; i < objectPositions.size(); i++) {
 		mat4 modelMat = mat4(1.0f);
 		modelMat = glm::translate(modelMat, objectPositions[i]);
@@ -227,7 +246,10 @@ void drawGUI() {
 	ImGui::Begin("ToolBox");
 
 	// =======================绘制ImGUI=========================
-
+	ImGui::Checkbox("DebugShadowMap", &debugShadowMap);
+	ImGui::Checkbox("ShowShadow", &useShadowMap);
+	ImGui::SliderFloat("", &lightRotateOffsetY, -180.0f, 180.0f);
+	ImGui::Text("LightRotateOffsetY");
 
 	// =========================================================
 

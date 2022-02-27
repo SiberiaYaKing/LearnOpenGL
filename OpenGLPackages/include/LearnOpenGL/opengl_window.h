@@ -74,6 +74,10 @@ public:
 		if (isOn) glEnable(GL_FRAMEBUFFER_SRGB);
 		else glDisable(GL_FRAMEBUFFER_SRGB);
 	}
+
+	inline void resetSize(int width, int height) {
+		glfwSetWindowSize(window, width, height);
+	}
 	//inline unsigned int getHeight() const {
 	//	return height;
 	//}

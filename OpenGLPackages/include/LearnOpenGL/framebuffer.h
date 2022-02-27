@@ -101,6 +101,12 @@ public:
 		glActiveTexture(0);
 	}
 
+	void clearDepth(float r = 1, float g = 1, float b = 1, float a = 1) {
+		glClearColor(r, g, b, a);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(0);
+	}
+
 	void bindColorBuffer() {
 		for (int i = 0; i < colorBuffers.size(); i++) {
 			glActiveTexture(GL_TEXTURE0 + i);
@@ -219,7 +225,7 @@ class ShadowMapFrameBuffer :public Framebuffer {
 public:
 
 	ShadowMapFrameBuffer(unsigned int bufferWidth, unsigned int bufferHeight)
-		:showShadowMapShader(Shader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceLighting/ShadowMapping/showShadowMap.fs")){
+		:showShadowMapShader(Shader(dir_shaders + "AdvanceOpenGL/frame_buffer/frame_buffer.vs", dir_shaders + "AdvanceOpenGL/frame_buffer/showShadowMap.fs")){
 		glGenFramebuffers(1, &framebuffer);
 
 		glGenTextures(1, &depthMapBuffer);
@@ -246,7 +252,7 @@ public:
 	}
 	void drawForShowShadowMap() {
 		showShadowMapShader.use();
-		showShadowMapShader.setInt("depthMap", 0);
+		showShadowMapShader.setInt("depthMap",0);
 		glBindVertexArray(screenVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMapBuffer);
