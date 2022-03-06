@@ -15,16 +15,17 @@
 
 const std::string TEXTURE_DIFFUSE = "texture_diffuse";
 const std::string TEXTURE_SPECULAR = "texture_specular";
+const std::string TEXTURE_NORMAL = "texture_normal";
 
 const std::string SHADER_DEFAULT = "Default";
 const std::string SHADER_PBR = "PBR";
+const unsigned int MAX_TEXTURE_ID = 3;
 
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;
 	glm::vec3 Tangent = glm::vec3(0);
-	glm::vec3 Bitangent = glm::vec3(0);
 };
 
 struct Texture {
@@ -113,6 +114,8 @@ void Mesh::setupMesh() {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+	glEnableVertexAttribArray(3);
 
 	glBindVertexArray(0); //Ω‚∞Û
 
@@ -155,6 +158,7 @@ void Mesh::drawInstance(Shader shader, GLsizei count, const std::string& shaderT
 void Mesh::setupDefaultShader(Shader& shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+	unsigned int normalNr = 1;
 	shader.use();
 	// «∑Ò”–Ã˘Õº
 	if (textures.size()) {
@@ -167,6 +171,9 @@ void Mesh::setupDefaultShader(Shader& shader) {
 				number = std::to_string(diffuseNr++);
 			else if (name == TEXTURE_SPECULAR)
 				number = std::to_string(specularNr++);
+			else if (name == TEXTURE_NORMAL) {
+				number = std::to_string(normalNr++);
+			}
 			shader.setInt(name + number, i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}

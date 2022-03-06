@@ -5,8 +5,8 @@ using namespace glm;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 560;
-const unsigned int SHADOW_WIDTH = 1024;
-const unsigned int SHADOW_HEIGHT = 1024;
+const unsigned int SHADOW_WIDTH = 2048;
+const unsigned int SHADOW_HEIGHT = 2048;
 
 Camera camera(glm::vec3(0.0f, 0.1f, 5.0f));
 
@@ -17,25 +17,34 @@ const string shaderDir = dir_shaders + "AdvanceLighting/ShadowMapping/";
 struct DirectionLight
 {
 	DirectionLight() {
-		GLfloat near_plane = 1.0f, far_plane = 20.0f;
-		glm::vec3 lightPos(4, 4, 4.8);
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		GLfloat near_plane = 1.0f, far_plane = 20.0f, orthoSize = 5.0f;
+		glm::vec3 lightPos(4, 3, 4.8);
+		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 		glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		lightSpaceMat = lightProjection * lightView;
+		originLightSpaceMat = lightSpaceMat;
+		originLightDir = vec4(lightDir, 0);
 	}
+	inline const mat4& getOriginLightSpaceMat() { return originLightSpaceMat; }
+	inline const vec4& getOriginLightDir() { return originLightDir; }
 	bool isDirLight = true;
 	vec3 lightDir = { -0.5f, -0.5f, -0.6f };
 	vec3 dla = { 0.4, 0.4, 0.4 };
 	vec3 dld = { 0.7, 0.7, 0.7, };
 	vec3 dls = { 0.9f, 0.9f, 0.9f,};
 	mat4 lightSpaceMat;
+
+private:
+	glm::mat4 originLightSpaceMat;
+	glm::vec4 originLightDir;
 };
 
 void RenderScene(vector<glm::vec3>& objectPositions, Model& nanosuit, Mesh& groundMesh, Shader& shader);
+void UpdateLight(DirectionLight& light);
 
 bool debugShadowMap = false;
 bool useShadowMap = true;
-bool useNormalMap = true;
+bool useNormalMap = false;
 float lightRotateOffsetY = 0;
 
 int main() {
@@ -128,8 +137,7 @@ int main() {
 	
 	Shader phongShader(shaderDir + "StandardPhong.vs", shaderDir + "StandardPhong.fs");
 	DirectionLight light;
-	glm::mat4 originLightSpaceMat = light.lightSpaceMat;
-	glm::vec4 originLightDir = vec4(light.lightDir,0);
+	
 	// ############# ShadowMap prepare ##########
 	ShadowMapFrameBuffer shadowFB(SHADOW_WIDTH, SHADOW_HEIGHT);
 	Shader shadowMapShader(shaderDir +"simpleDepthShader.vs", shaderDir +"simpleDepthShader.fs");
@@ -156,9 +164,7 @@ int main() {
 		mat4 view = camera.GetViewMatrix();
 
 		// =========================绘制其他渲染对象=====================
-		float lightRotateOffsetYRadians = glm::radians(lightRotateOffsetY);
-		light.lightSpaceMat = glm::rotate(originLightSpaceMat, lightRotateOffsetYRadians, glm::vec3(0, 1, 0));
-		light.lightDir = glm::rotate(mat4{}, lightRotateOffsetYRadians, glm::vec3(0, -1, 0))*originLightDir;
+		UpdateLight(light);
 		shadowMapShader.use();
 		shadowMapShader.setMat4("lightSpaceMatrix", light.lightSpaceMat);
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -193,8 +199,10 @@ int main() {
 			phongShader.setMat4("projection", projection);
 			// setup ShadowMap texture
 			phongShader.setMat4("lightSpaceMatrix", light.lightSpaceMat);
-			glActiveTexture(GL_TEXTURE0 + groundMesh.textures.size());
-			phongShader.setInt("shadowMap", groundMesh.textures.size());
+			int textureCount = MAX_TEXTURE_ID;
+			glActiveTexture(GL_TEXTURE0 + textureCount);
+			phongShader.setInt("shadowMap", textureCount);
+			phongShader.setBool("useNormalMap", useNormalMap);
 			glBindTexture(GL_TEXTURE_2D, shadowFB.getDepthMapBuffer());
 
 			RenderScene(objectPositions, nanosuit, groundMesh, phongShader);
@@ -223,11 +231,18 @@ int main() {
 	return 0;
 }
 
+void UpdateLight(DirectionLight& light) {
+	float lightRotateOffsetYRadians = glm::radians(lightRotateOffsetY);
+	light.lightSpaceMat = glm::rotate(light.getOriginLightSpaceMat(), lightRotateOffsetYRadians, glm::vec3(0, 1, 0));
+	light.lightDir = glm::rotate(mat4{}, lightRotateOffsetYRadians, glm::vec3(0, -1, 0)) *light.getOriginLightDir();
+}
+
 void RenderScene(vector<glm::vec3>& objectPositions, Model& nanosuit, Mesh& groundMesh, Shader& shader) {
+	float scaleSize = 0.2;
 	for (int i = 0; i < objectPositions.size(); i++) {
 		mat4 modelMat = mat4(1.0f);
 		modelMat = glm::translate(modelMat, objectPositions[i]);
-		modelMat = glm::scale(modelMat, { 0.2,0.2,0.2 });
+		modelMat = glm::scale(modelMat, { scaleSize,scaleSize,scaleSize });
 		shader.setMat4("model", modelMat);
 		nanosuit.Draw(shader);
 	}
@@ -238,6 +253,7 @@ void RenderScene(vector<glm::vec3>& objectPositions, Model& nanosuit, Mesh& grou
 	groundModelMat = glm::rotate(groundModelMat, glm::half_pi<float>(), { -1,0,0 });
 	groundModelMat = glm::scale(groundModelMat, { 50,50,50 });
 	shader.setMat4("model", groundModelMat);
+	shader.setBool("useNormalMap", false);
 	groundMesh.Draw(shader);
 	glCullFace(GL_BACK);
 }
@@ -248,6 +264,7 @@ void drawGUI() {
 	// =======================绘制ImGUI=========================
 	ImGui::Checkbox("DebugShadowMap", &debugShadowMap);
 	ImGui::Checkbox("ShowShadow", &useShadowMap);
+	ImGui::Checkbox("UseNormalMap", &useNormalMap);
 	ImGui::SliderFloat("", &lightRotateOffsetY, -180.0f, 180.0f);
 	ImGui::Text("LightRotateOffsetY");
 

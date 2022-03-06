@@ -108,17 +108,17 @@ int main() {
 	Mesh lampCube(cubedata.vertices, cubedata.indices, cubedata.textures);
 
 	// perpare Lights
-	const GLuint NR_LIGHTS = 32;
+	const GLuint NR_LIGHTS = 64, rangeSize = 16;
 	vector<vec3> lightPositions;
 	vector<vec3> lightColors;
 	srand(13);
 	for (GLuint i = 0; i < NR_LIGHTS; i++)
 	{
 		// Calculate slightly random offsets
-		GLfloat xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+		GLfloat xPos = ((rand() % 100) / 100.0) * rangeSize - 0.5f * rangeSize;
 		GLfloat yPos = ((rand() % 100) / 100.0) * 5.0 - 4.0;
-		GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+		GLfloat zPos = ((rand() % 100) / 100.0) * rangeSize - 0.5f * rangeSize;
+		lightPositions.push_back(glm::vec3(xPos, yPos, zPos)); 
 		// Also calculate random color
 		GLfloat rColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.8 and 1.0
 		GLfloat gColor = clamp(((rand() % 100) / 200.0f) + 0.8, 0.8, 1.0); // Between 0.8 and 1.0
@@ -159,7 +159,9 @@ int main() {
 		mat4 view = camera.GetViewMatrix();
 
 		// =========================绘制其他渲染对象=====================
-		updateLevel(modelMatrices, nanosuit);
+		if (oldLevel != level) {
+			updateLevel(modelMatrices, nanosuit);
+		}
 		/*Gbuffer pass*/
 		gBuffer.switch2Framebuffer();
 		glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -251,54 +253,55 @@ int main() {
 }
 
 void updateLevel(vector<mat4>& modelMatrices,const Model& nanosuit) {
-	if (oldLevel != level) {
-		oldLevel = level;
-		//postionOffset
-		int step = 3;
-		int size = level * 2 - 1;
-		vec3 originPos = vec3(-3.0*(size/2), -3.0, -3.0 *(size/2));
-		vector<glm::vec3> objectPositions;
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				objectPositions.push_back(originPos + vec3(step*i, 0, step*j));
-			}
+	oldLevel = level;
+	//postionOffset
+	int step = 3;
+	int size = level * 2 - 1;
+	vec3 originPos = vec3(-3.0*(size/2), -3.0, -3.0 *(size/2));
+	vector<glm::vec3> objectPositions;
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			objectPositions.push_back(originPos + vec3(step*i, 0, step*j));
 		}
-		modelMatrices.clear();
-		//generate list of modelMatrices
-		for (GLuint i = 0; i < objectPositions.size(); i++)
-		{
-			glm::mat4 model = glm::mat4();
-			model = glm::translate(model, objectPositions[i]);
-			model = glm::scale(model, glm::vec3(0.25f));
-			modelMatrices.push_back(model);
-		}
-		// setup modelMatrices
-		unsigned int modelMatricesBuffer;
-		glGenBuffers(1, &modelMatricesBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
-		glBufferData(GL_ARRAY_BUFFER, modelMatrices.size() * sizeof(mat4), modelMatrices.data(), GL_STATIC_DRAW);
-		// setup VAO , add modelmatrix pointer
-		vector<Mesh> nanosuitMeshes;
-		nanosuit.getMeshes(nanosuitMeshes);
-		for (int i = 0; i < nanosuitMeshes.size(); i++) {
-			unsigned int tempVAO = nanosuitMeshes[i].getVAO();
-			glBindVertexArray(tempVAO);
-			glEnableVertexAttribArray(3);
-			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-			glEnableVertexAttribArray(4);
-			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-			glEnableVertexAttribArray(5);
-			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-			glEnableVertexAttribArray(6);
-			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+	}
+	modelMatrices.clear();
+	//generate list of modelMatrices
+	for (GLuint i = 0; i < objectPositions.size(); i++)
+	{
+		glm::mat4 model = glm::mat4();
+		model = glm::translate(model, objectPositions[i]);
+		model = glm::scale(model, glm::vec3(0.25f));
+		modelMatrices.push_back(model);
+	}
+	// setup modelMatrices
+	unsigned int modelMatricesBuffer;
+	glGenBuffers(1, &modelMatricesBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, modelMatricesBuffer);
+	glBufferData(GL_ARRAY_BUFFER, modelMatrices.size() * sizeof(mat4), modelMatrices.data(), GL_STATIC_DRAW);
+	// setup VAO , add modelmatrix pointer
+	vector<Mesh> nanosuitMeshes;
+	nanosuit.getMeshes(nanosuitMeshes);
+	for (int i = 0; i < nanosuitMeshes.size(); i++) {
+		unsigned int tempVAO = nanosuitMeshes[i].getVAO();
+		glBindVertexArray(tempVAO);
 
-			glVertexAttribDivisor(3, 1);
-			glVertexAttribDivisor(4, 1);
-			glVertexAttribDivisor(5, 1);
-			glVertexAttribDivisor(6, 1);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+		glVertexAttribDivisor(3, 1);
 
-			glBindVertexArray(0);
-		}
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+		glVertexAttribDivisor(4, 1);
+
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glVertexAttribDivisor(5, 1);
+
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
 	}
 }
 

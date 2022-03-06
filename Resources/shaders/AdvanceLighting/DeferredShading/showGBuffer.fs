@@ -19,7 +19,7 @@ struct Light{
     float Radius;
 };
 
-const int NR_LIGHTS = 32;
+const int NR_LIGHTS = 64;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
@@ -48,7 +48,7 @@ void main(){
             vec3 normal = texture(normalTex,TexCoords).rgb;
             vec4 albedoSpec = texture(albedoSpecTex,TexCoords);
             // 计算光照
-            vec3 lighting = albedoSpec.rgb*0.1; // 硬编码环境光分量
+            vec3 lighting = albedoSpec.rgb*0.05; // 硬编码环境光分量
             vec3 viewDir = normalize(viewPos-fragPos);
 
             //dir Light
@@ -79,11 +79,11 @@ void main(){
                     float spec = 0;
                     if(lightingMode == 0){ //Phong
                         vec3 reflectDir = reflect(-lightDir,normal);
-                        spec = pow(max(dot(reflectDir,viewDir),0.0),16.0);
+                        spec = pow(max(dot(reflectDir,viewDir),0.0),32.0);
                     }
                     else if(lightingMode == 1){ //Blinn
                         vec3 halfDir = normalize(lightDir+viewDir);
-                        spec = pow (max(dot(normal,halfDir),0.0),16.0);
+                        spec = pow (max(dot(normal,halfDir),0.0),32.0);
                     }
                     vec3 specular = lights[i].Color*spec*albedoSpec.a;
                     //衰减
