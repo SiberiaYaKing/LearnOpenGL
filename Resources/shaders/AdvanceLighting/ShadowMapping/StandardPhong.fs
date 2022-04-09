@@ -93,7 +93,14 @@ float CalcShadow(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal){
 
 vec3 CalcDirLight(DirLight light,vec3 normal,vec3 viewDir){
 	if(light.isOn){
-		vec3 lightDir = normalize(-light.direction);
+		vec3 lightDir;
+		if(useNormalMap){
+			lightDir = normalize(-fs_in.TangentLightDir);
+		}
+		else{
+			lightDir = normalize(-light.direction);
+		}
+		
 		float diff= max(dot(lightDir,normal),0);
 		vec3 reflectDir = reflect(-lightDir,normal);
 		float spec = pow(max(dot(reflectDir,viewDir),0.0),shininess);
@@ -110,7 +117,7 @@ vec3 CalcDirLight(DirLight light,vec3 normal,vec3 viewDir){
 			specular = light.specular*spec*vec3(0.7,0.7,0.7);
 		}
 
-		float shadowFac = CalcShadow(fs_in.FragPosLightSpace,lightDir,normal);
+		float shadowFac = CalcShadow(fs_in.FragPosLightSpace,normalize(-light.direction),fs_in.Normal);
 		return (ambient+shadowFac*(diffuse+specular));
 	}
 	else return vec3(0);
