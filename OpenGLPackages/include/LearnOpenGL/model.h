@@ -17,12 +17,12 @@ class Model {
 private:
 	std::vector<Texture> textures_loaded;
 public:
-	Model(const char *path , bool isCorrectTangent = false) {
-		this->isCorrectTangent = isCorrectTangent;
+	Model(const char *path /*, bool isCorrectTangent = false*/) {
+		//this->isCorrectTangent = isCorrectTangent;
 		loadModel(path);
 	}
-	Model(const std::string &path , bool isCorrectTangent = false) {
-		this->isCorrectTangent = isCorrectTangent;
+	Model(const std::string &path /*, bool isCorrectTangent = false*/) {
+		//this->isCorrectTangent = isCorrectTangent;
 		loadModel(path);
 	}
 	void Draw(Shader shader, const std::string& shaderType = SHADER_DEFAULT);
@@ -34,7 +34,7 @@ private:
 	std::vector<Mesh> meshes;
 	std::string directory;
 
-	bool isCorrectTangent = false;
+	//bool isCorrectTangent = false;
 
 	void loadModel(const std::string &path);
 	void processNode(aiNode *node, const aiScene *scene);
@@ -100,40 +100,40 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 		else vertex.TexCoords = glm::vec2(0.0f);
 		vertices.push_back(vertex);
 	}
-	std::vector<Vertex *> faceVertices;
+	//std::vector<Vertex *> faceVertices;
 	//处理构成面的顶点索引
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 		aiFace face = mesh->mFaces[i];  //由索引形成的面，三角形就是三个索引
-		faceVertices.clear();
+		//faceVertices.clear();
 		//处理索引
 		for (unsigned int j = 0; j < face.mNumIndices; j++) {
 			int index = face.mIndices[j];
-			faceVertices.push_back(&vertices[index]);
-			if (isCorrectTangent) {
-				float x = faceVertices[j]->TexCoords.x;
-				float y = faceVertices[j]->TexCoords.y;
-				x = x > 1 ? x - 1 : x;
-				y = y > 1 ? y - 1 : y;
-				faceVertices[j]->TexCoords.x = x;
-				faceVertices[j]->TexCoords.y = y;
-			}
+			//faceVertices.push_back(&vertices[index]);
+			//if (isCorrectTangent) {
+			//	float x = faceVertices[j]->TexCoords.x;
+			//	float y = faceVertices[j]->TexCoords.y;
+			//	x = x > 1 ? x - 1 : x;
+			//	y = y > 1 ? y - 1 : y;
+			//	faceVertices[j]->TexCoords.x = x;
+			//	faceVertices[j]->TexCoords.y = y;
+			//}
 			indices.push_back(index);
 		}
-		if (isCorrectTangent) {
-			glm::vec3 tangent = { 0,0,0 };
-			glm::vec3 edge1 = faceVertices[1]->Position - faceVertices[0]->Position;
-			glm::vec3 edge2 = faceVertices[2]->Position - faceVertices[0]->Position;
-			glm::vec2 deltaUV1 = faceVertices[1]->TexCoords - faceVertices[0]->TexCoords;
-			glm::vec2 deltaUV2 = faceVertices[2]->TexCoords - faceVertices[0]->TexCoords;
-			//GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-			tangent.x = /*f **/ (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-			tangent.y = /*f **/ (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-			tangent.z = /*f **/ (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-			tangent = glm::normalize(tangent);
-			for (unsigned int j = 0; j < face.mNumIndices; j++) {
-				faceVertices[j]->Tangent = tangent;
-			}
-		}
+		//if (isCorrectTangent) {
+		//	glm::vec3 tangent = { 0,0,0 };
+		//	glm::vec3 edge1 = faceVertices[1]->Position - faceVertices[0]->Position;
+		//	glm::vec3 edge2 = faceVertices[2]->Position - faceVertices[0]->Position;
+		//	glm::vec2 deltaUV1 = faceVertices[1]->TexCoords - faceVertices[0]->TexCoords;
+		//	glm::vec2 deltaUV2 = faceVertices[2]->TexCoords - faceVertices[0]->TexCoords;
+		//	//GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+		//	tangent.x = /*f **/ (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+		//	tangent.y = /*f **/ (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+		//	tangent.z = /*f **/ (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+		//	tangent = glm::normalize(tangent);
+		//	for (unsigned int j = 0; j < face.mNumIndices; j++) {
+		//		faceVertices[j]->Tangent = tangent;
+		//	}
+		//}
 	}
 	
 	//处理材质
