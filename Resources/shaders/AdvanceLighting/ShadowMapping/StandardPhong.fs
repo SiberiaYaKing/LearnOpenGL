@@ -48,7 +48,7 @@ void main(){
 	if(useNormalMap){
 		viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
 		//viewDir = normalize(viewPos-fs_in.FragPos);//debug
-		norm = texture(texture_normal1, fs_in.TexCoords).rgb;
+		norm = texture(texture_normal1, fs_in.TexCoords).rgb*1.2;
 		norm = normalize(norm * 2.0 - 1.0);
 		//norm = normalize(transpose(fs_in.TBN)*norm); //debug
 	}

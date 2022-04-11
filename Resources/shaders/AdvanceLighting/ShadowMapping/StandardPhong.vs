@@ -9,16 +9,8 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrix;
 
-struct DirLight {
-	bool isOn;
-	vec3 direction;
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-uniform DirLight dirLight;
-
+uniform vec3 vsLightDir;
 uniform vec3 viewPos;
 uniform bool useNormalMap;
 
@@ -47,7 +39,7 @@ void main()
 		tangent = normalize(tangent-dot(tangent,vs_out.Normal)*vs_out.Normal);
 		vec3 bitangent = normalize(cross(tangent,vs_out.Normal));
 		mat3 TBN = transpose(mat3(tangent,bitangent,vs_out.Normal));
-		vs_out.TangentLightDir = TBN*dirLight.direction;
+		vs_out.TangentLightDir = TBN* vsLightDir;;
 		vs_out.TangentFragPos = TBN*vs_out.FragPos;
 		vs_out.TangentViewPos = TBN*viewPos;
 		//vs_out.TBN = TBN; //debug

@@ -109,10 +109,10 @@ int main() {
 	// ========================…Ë÷√‰÷»æ∂‘œÛ=========================
 
 	//perpare model
-	Model nanosuit(dir_models + "nanosuit/nanosuit.obj");
+	Model nanosuit(dir_models + "Katana/katana.obj");
 	vector<glm::vec3> objectPositions;
 	float spacing = 2.0;
-	float height = -3.0;
+	float height = -1.6;
 	objectPositions.push_back(glm::vec3(-spacing, height, -spacing));
 	objectPositions.push_back(glm::vec3(0.0, height, -spacing));
 	objectPositions.push_back(glm::vec3(spacing, height, -spacing));
@@ -194,6 +194,7 @@ int main() {
 			phongShader.setVec3("dirLight.ambient", light.dla);
 			phongShader.setVec3("dirLight.specular", light.dls);
 			phongShader.setVec3("dirLight.direction", light.lightDir);
+			phongShader.setVec3("vsLightDir", light.lightDir);
 			phongShader.setVec3("viewPos", camera.Position);
 			phongShader.setMat4("view", view);
 			phongShader.setMat4("projection", projection);
@@ -238,10 +239,11 @@ void UpdateLight(DirectionLight& light) {
 }
 
 void RenderScene(vector<glm::vec3>& objectPositions, Model& nanosuit, Mesh& groundMesh, Shader& shader) {
-	float scaleSize = 0.2;
+	float scaleSize = 0.1;
 	for (int i = 0; i < objectPositions.size(); i++) {
 		mat4 modelMat = mat4(1.0f);
 		modelMat = glm::translate(modelMat, objectPositions[i]);
+		modelMat = glm::rotate(modelMat, -glm::half_pi<float>(), { 0,0,1 });
 		modelMat = glm::scale(modelMat, { scaleSize,scaleSize,scaleSize });
 		shader.setMat4("model", modelMat);
 		nanosuit.Draw(shader);

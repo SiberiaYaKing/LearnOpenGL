@@ -20,6 +20,7 @@ const std::string TEXTURE_NORMAL = "texture_normal";
 const std::string SHADER_DEFAULT = "Default";
 const std::string SHADER_PBR = "PBR";
 const unsigned int MAX_TEXTURE_ID = 3;
+const unsigned int MAX_FACE_VERTEX_COUNT = 3;
 
 struct Vertex {
 	glm::vec3 Position;
